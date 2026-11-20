@@ -146,7 +146,8 @@ section{display:flex;flex-direction:column;gap:14px}
 .fm{position:fixed;inset:0;z-index:50;background:var(--bg);display:flex;flex-direction:column;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;overscroll-behavior:none;
   padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);padding-left:max(12px,env(safe-area-inset-left,0px));padding-right:max(12px,env(safe-area-inset-right,0px))}
 .fm-bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;padding-block:8px 4px;touch-action:manipulation}
-.fm-note{display:flex;align-items:baseline;gap:10px;min-width:0;flex:1}
+.fm-note{display:flex;align-items:baseline;gap:10px;flex:0 0 auto;margin-right:auto}
+@media (max-width:420px){.seg .z{display:none}.seg button,.fm-x{padding:8px 10px}}
 .fm-note b{font-family:var(--f-display);font-weight:800;font-size:40px;line-height:1;min-width:1.4em}
 .fm-note .fjp{font-family:var(--f-display);font-weight:700;font-size:22px}
 .fm-note .ftg{font-size:14px;color:var(--guide);font-weight:600}
@@ -185,8 +186,8 @@ section{display:flex;flex-direction:column;gap:14px}
 .fm-tube.horiz{border-radius:44px 14px 14px 44px;background:linear-gradient(180deg,var(--wood-lo),var(--wood-hi) 35%,var(--wood-mid) 62%,var(--wood-lo))}
 .fm-x[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .fm-in{display:flex;flex-direction:column;height:100%;min-height:0}
-.fm.flip .fm-in{transform:rotate(180deg)}
-.fm.flip{padding-top:env(safe-area-inset-bottom,0px);padding-bottom:env(safe-area-inset-top,0px)}
+.fm-tube.flipv{border-radius:14px 14px 44px 44px}
+.fm-tube.horiz.fliph{border-radius:14px 44px 44px 14px}
 @media (max-height:500px) and (orientation:landscape){
   .fm-bar{padding-block:4px 2px}.fm-note b{font-size:28px}.fm-note .fjp{font-size:18px}
   .seg button,.fm-x{padding:5px 9px}.fm-row{padding-bottom:2px}.fm-row #fmMsg{flex-basis:100%}
@@ -282,10 +283,10 @@ section{display:flex;flex-direction:column;gap:14px}
   <div class="fm-bar">
     <div class="fm-note"><b id="fmNote">C</b><span class="fjp" id="fmJp"></span><span class="ftg" id="fmTgt"></span></div>
     <div class="seg" role="group" aria-label="How to blow">
-      <button type="button" data-mode="touch" aria-pressed="true">Touch 触摸</button>
-      <button type="button" data-mode="mic" aria-pressed="false">Mic 吹气</button>
+      <button type="button" data-mode="touch" aria-pressed="true">Touch<span class="z"> 触摸</span></button>
+      <button type="button" data-mode="mic" aria-pressed="false">Mic<span class="z"> 吹气</span></button>
     </div>
-    <button type="button" class="fm-x" id="fmFlip" aria-pressed="false" title="Put the mouthpiece at the phone's microphone end, then hold the phone upside down">Flip ⇅</button>
+    <button type="button" class="fm-x" id="fmFlip" aria-pressed="false" title="Move the recorder's mouthpiece to the microphone end">Flip ⇅</button>
     <button type="button" class="fm-x" id="fmExit">Exit</button>
   </div>
   <div class="fm-row">
@@ -736,13 +737,18 @@ function layoutFM(){
     pos['6:2']=[cx+P*0.92,y(6),P*0.3]; pos['7:2']=[cx+P*0.92,y(7),P*0.3];
     Object.assign(hint.style,{left:'0px',maxWidth:Math.max(90,cx-P*1.1-8)+'px'});
   }
+  // Flip mirrors only the instrument: mouthpiece to the bottom (portrait, the microphone end) or the right (landscape).
+  tube.classList.toggle('flipv',flipped&&!horiz); tube.classList.toggle('fliph',flipped&&horiz);
+  if(flipped) for(const k in pos){ const q=pos[k]; if(horiz) q[0]=w-q[0]; else q[1]=h-q[1] }
+  if(flipped&&!horiz) Object.assign(hint.style,{top:'6px',bottom:'auto'}); else Object.assign(hint.style,{top:'auto',bottom:'6px'});
+  if(flipped&&horiz){ const l=parseFloat(hint.style.left), mw=parseFloat(hint.style.maxWidth); hint.style.left=(w-l-mw)+'px' }
   zones=[];
   fmPads.forEach(d=>{const [x,yy,r]=pos[d.dataset.i+':'+d.dataset.v];
     d.style.left=x+'px'; d.style.top=yy+'px'; d.style.width=d.style.height=(r*2)+'px';
     zones.push({i:+d.dataset.i,v:+d.dataset.v,x,y:yy,r,tab:d.classList.contains('tab')})});
 }
 function hitZone(cX,cY){
-  const b=field.getBoundingClientRect(), x=flipped?b.right-cX:cX-b.left, y=flipped?b.bottom-cY:cY-b.top; let best=null, bd=1e9;
+  const b=field.getBoundingClientRect(), x=cX-b.left, y=cY-b.top; let best=null, bd=1e9;
   for(const z of zones){ const d=Math.hypot(x-z.x,y-z.y)/z.r; const lim=z.tab?1.25:1.3; if(d<lim&&d<bd){bd=d;best=z} }
   return best?{i:best.i,v:best.v}:{air:true};
 }
@@ -794,7 +800,7 @@ async function setFmMode(m){
   $('fmMic').hidden=m!=='mic'; $('fmHint').hidden=m!=='touch';
   if(m==='touch'){ fmText(field.clientWidth>field.clientHeight*1.15?'Lay the phone flat and play with your fingers in a row. Sound plays while any finger is down.':'Hold the phone upright like a recorder: left hand on 1–3, right hand on 4–7. Sound plays while any finger is down. Turn sideways to play flat on a table.'); return }
   fmText('Allow the microphone, keep fingers on the holes, and blow gently across the bottom of the phone.');
-  try{ await micStart(); fmText(flipped?'Blow gently at the microphone end. Say "tu" to tongue notes.':'Blow across the mic to play. Tip: press Flip and hold the phone upside down, so the mic is the mouthpiece.') }
+  try{ await micStart(); fmText(flipped?'Blow gently at the mouthpiece, by the microphone. Say "tu" to tongue notes.':'Blow across the mic at the bottom of the phone. Tip: press Flip to put the mouthpiece there.') }
   catch(err){ fmText('The microphone is not available here, so Touch mode is back on. Open the GitHub Pages version over https and allow the mic.'); setTimeout(()=>{ if(fmMode==='mic') setFmMode('touch') },2600) }
 }
 document.querySelectorAll('.seg button').forEach(b=>b.addEventListener('click',()=>{ensure();setFmMode(b.dataset.mode)}));
@@ -838,8 +844,8 @@ function closeFM(){
 }
 $('fmOpen').addEventListener('click',openFM);
 $('fmExit').addEventListener('click',closeFM);
-function setFlip(on){ flipped=on; fm.classList.toggle('flip',on); $('fmFlip').setAttribute('aria-pressed',on); layoutFM();
-  fmText(on?'Flipped: hold the phone upside down so its microphone end is at your lips, like the mouthpiece.':'Mouthpiece is at the top of the screen.') }
+function setFlip(on){ flipped=on;  $('fmFlip').setAttribute('aria-pressed',on); layoutFM();
+  const hz=field.clientWidth>field.clientHeight*1.15; fmText(on?(hz?'Mouthpiece is now on the right.':'Mouthpiece is now at the bottom, by the phone\'s microphone. Blow there in Mic mode.'):(hz?'Mouthpiece is on the left.':'Mouthpiece is at the top.')) }
 $('fmFlip').addEventListener('click',()=>setFlip(!flipped));
 window.addEventListener('resize',()=>{ if(!fm.hidden) layoutFM() });
 $('fmSong').addEventListener('change',e=>{ stopSong(); song=SONGS.find(s=>s.id===e.target.value); buildTabs(); buildSong(); render() });

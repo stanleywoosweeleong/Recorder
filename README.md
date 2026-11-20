@@ -11,7 +11,7 @@ A playable soprano recorder in one web page. Tap the holes to cover them, hold *
 4. Tap **Finger mode · 手指模式** for a full-screen recorder you play like the real one:
    - **Touch 触摸**: place your fingers on the holes. Sound plays while any finger is down, and the pitch follows the holes you cover. Tap empty space to tongue a repeated note. The small ½ pads half-cover the thumb, 6 and 7 holes.
    - **Mic 吹气**: allow the microphone, keep your fingers on the holes, and blow gently across the bottom of the phone. Say "tu" to tongue notes. Adjust Sensitivity if it starts too easily or too late.
-   - **Hold it like a recorder (portrait):** hold the phone upright, left hand on holes 1–3, right hand on 4–7, left thumb on T. In Mic mode press **Flip ⇅** and turn the phone upside down so its microphone end is at your lips, like the mouthpiece.
+   - **Hold it like a recorder (portrait):** hold the phone upright, left hand on holes 1–3, right hand on 4–7, left thumb on T. Press **Flip ⇅** to move the mouthpiece to the bottom of the screen, by the phone's microphone, and blow there in Mic mode. Only the recorder flips; the text stays upright.
    - **Flat on a table (landscape):** turn the phone sideways and the recorder lies flat with the mouthpiece on the left, so the fingers of both hands rest in a row. Low C needs all 8 fingers on the screen.
 
 ## If Listen's fingers don't match the sound
