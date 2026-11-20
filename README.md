@@ -13,6 +13,9 @@ A playable soprano recorder in one web page. Tap the holes to cover them, hold *
    - **Mic 吹气**: allow the microphone, keep your fingers on the holes, and blow gently across the bottom of the phone. Say "tu" to tongue notes. Adjust Sensitivity if it starts too easily or too late.
    - Lay the phone flat on a table so you can use fingers from both hands. Low C needs all 8 fingers on the screen.
 
+## If Listen's fingers don't match the sound
+Phones and Bluetooth speakers play sound a little late, and iPhone Safari doesn't report how late. Press **Tap to sync** (next to Volume, or in Finger mode), then tap the button on each of the 10 clicks. The app measures your delay and sets **Finger sync** for you. You can still fine-tune the slider: right if the fingers move too early, left if too late.
+
 ## On a computer
 Keys A S D F G H J K L ; ' play the natural notes, W E T Y U O P the sharps, 1–7 play 简谱 notes (Shift for the upper octave), and Space blows the fingering shown.
 

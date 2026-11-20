@@ -233,7 +233,8 @@ section{display:flex;flex-direction:column;gap:14px}
         </label>
         <label class="ctl" for="vol">Volume <input id="vol" type="range" min="0" max="100" value="70"></label>
         <label class="ctl" for="vib"><input id="vib" type="checkbox" checked> Vibrato</label>
-        <label class="ctl" for="sync" title="If the fingers move before you hear the note, slide right. If they move after, slide left.">Finger sync <input id="sync" type="range" min="-300" max="600" step="10" value="0"> <span id="syncv">0 ms</span></label>
+        <label class="ctl" for="sync" title="If the fingers move before you hear the note, slide right. If they move after, slide left.">Finger sync <input id="sync" type="range" min="-300" max="800" step="10" value="0"> <span id="syncv">0 ms</span></label>
+        <button class="ghost" id="calib" type="button">Tap to sync</button>
         <button class="ghost" id="openAll" type="button">Open all</button>
         <button class="ghost" id="closeAll" type="button">Cover all</button>
       </div>
@@ -283,7 +284,8 @@ section{display:flex;flex-direction:column;gap:14px}
     <button type="button" id="fmPractice">Practice</button>
     <span id="fmMic" hidden><span style="display:inline-flex;align-items:center;gap:6px">Breath <span class="meter" id="meter"><i></i></span></span>
       <label for="sens" style="display:inline-flex;align-items:center;gap:6px;margin-left:8px">Sensitivity <input id="sens" type="range" min="1" max="100" value="55" style="width:80px"></label></span>
-    <span style="display:inline-flex;align-items:center;gap:6px">Sync <input id="sync2" type="range" min="-300" max="600" step="10" value="0" style="width:80px" aria-label="Finger sync"></span>
+    <span style="display:inline-flex;align-items:center;gap:6px">Sync <input id="sync2" type="range" min="-300" max="800" step="10" value="0" style="width:80px" aria-label="Finger sync"> <span id="syncv2">0 ms</span></span>
+    <button type="button" id="calib2">Tap to sync</button>
     <span id="fmMsg">Touch the holes to play. Sound plays while any finger is down.</span>
   </div>
   <div class="fm-field" id="fmField">
@@ -615,12 +617,37 @@ $('practice').addEventListener('click',()=>{
 let demoRaf=0;
 function pulse(){ ['blow','win','fmNote'].forEach(id=>{const e=document.getElementById(id); if(!e) return; e.classList.remove('flash'); void e.getBoundingClientRect(); e.classList.add('flash')}) }
 const syncEl=$('sync'), sync2=$('sync2');
-const showSync=()=>{ $('syncv').textContent=(syncEl.value>0?'+':'')+syncEl.value+' ms'; sync2.value=syncEl.value };
+const showSync=()=>{ const t=(syncEl.value>0?'+':'')+syncEl.value+' ms'; $('syncv').textContent=t; $('syncv2').textContent=t; sync2.value=syncEl.value };
 try{ const v=localStorage.getItem('recorderSync'); if(v!=null) syncEl.value=v }catch(_){}
 const onSync=()=>{ showSync(); try{localStorage.setItem('recorderSync',syncEl.value)}catch(_){} };
 syncEl.addEventListener('input',onSync);
 sync2.addEventListener('input',()=>{ syncEl.value=sync2.value; onSync() });
 showSync();
+// Tap to sync: play clicks on the audio clock, time the player's taps, and set the delay from the median gap.
+function calibrate(btn,say){
+  ensure(); if(!A.ctx||btn.dataset.busy) return;
+  stopSong(); releaseAll(); btn.dataset.busy='1';
+  const label=btn.textContent, N=10, beat=0.6, t0=A.ctx.currentTime+0.6, clicks=[], taps=[];
+  for(let i=0;i<N;i++){ const t=t0+i*beat; clicks.push(t);
+    const o=A.ctx.createOscillator(), g=A.ctx.createGain(); o.frequency.value=1320;
+    g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(0.6,t+0.002); g.gain.exponentialRampToValueAtTime(0.001,t+0.07);
+    o.connect(g); g.connect(A.master); o.start(t); o.stop(t+0.1) }
+  const onTap=e=>{ e.preventDefault(); taps.push(A.ctx.currentTime) };
+  const onKey=e=>{ if(e.code==='Space'||e.code==='Enter'){ e.preventDefault(); e.stopImmediatePropagation(); if(!e.repeat) taps.push(A.ctx.currentTime) } };
+  btn.addEventListener('pointerdown',onTap); window.addEventListener('keydown',onKey,true);
+  btn.textContent='Tap here on each click'; say('Listen to the 10 clicks and tap this button (or Space) exactly on each one.');
+  setTimeout(()=>{
+    btn.removeEventListener('pointerdown',onTap); window.removeEventListener('keydown',onKey,true);
+    btn.textContent=label; delete btn.dataset.busy;
+    const gaps=taps.map(t=>{let best=1e9; for(const c of clicks){const d=t-c; if(Math.abs(d)<Math.abs(best)) best=d} return best}).filter(d=>d>-0.2&&d<0.9).sort((a,b)=>a-b);
+    if(gaps.length<5){ say('Not enough taps were caught. Press Tap to sync and tap along with every click.'); return }
+    const med=gaps[Math.floor(gaps.length/2)], auto=(A.ctx.outputLatency||0)+(A.ctx.baseLatency||0);
+    syncEl.value=Math.max(-300,Math.min(800,Math.round((med-auto)*100)*10)); onSync();
+    say(`Synced. Your sound arrives about ${Math.round(med*1000)} ms after the app plays it, so the fingers now wait for it. Try Listen.`);
+  },(t0-A.ctx.currentTime+N*beat+0.7)*1000);
+}
+$('calib').addEventListener('click',e=>calibrate(e.currentTarget,t=>setMsg(t)));
+$('calib2').addEventListener('click',e=>calibrate(e.currentTarget,t=>fmText(t)));
 function scheduleSong(list,t0){
   const now=A.ctx.currentTime, beat=60/song.bpm, vib=$('vib').checked;
   [A.g.gain,A.ng.gain,A.lfoG.gain,A.osc.frequency,A.lp.frequency,A.bp.frequency].forEach(p=>hold(p,now));
