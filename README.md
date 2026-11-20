@@ -19,6 +19,9 @@ It is an installable app (PWA) that works offline. Open the link once while onli
 ## If Listen's fingers don't match the sound
 Phones and Bluetooth speakers play sound a little late, and iPhone Safari doesn't report how late. Press **Tap to sync** (next to Volume, or in Finger mode), then tap the button on each of the 10 clicks. The app measures your delay and sets **Finger sync** for you. You can still fine-tune the slider: right if the fingers move too early, left if too late.
 
+## Metronome 节拍器
+Press **Start** in the Metronome panel (or **M** on a keyboard, or **♩** in Finger mode). Set the speed with − / +, the slider, or **Tap tempo**; pick 2/4, 3/4 or 4/4 for the accented first beat; **Use song tempo** matches the selected song. If the metronome is on when you press Listen, it restarts in step with the song.
+
 ## On a computer
 Keys A S D F G H J K L ; ' play the natural notes, W E T Y U O P the sharps, 1–7 play 简谱 notes (Shift for the upper octave), and Space blows the fingering shown.
 

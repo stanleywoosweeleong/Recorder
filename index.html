@@ -198,6 +198,26 @@ section{display:flex;flex-direction:column;gap:14px}
   .fm-bar{padding-block:4px 2px}.fm-note b{font-size:28px}.fm-note .fjp{font-size:18px}
   .seg button,.fm-x{padding:5px 9px}.fm-row{padding-bottom:2px}.fm-row #fmMsg{flex-basis:100%}
 }
+/* metronome */
+.metro{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.mhead{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.mhead h3{margin:0;font-family:var(--f-display);font-size:17px;font-weight:700;margin-right:auto}
+.mhead h3 span{color:var(--muted);font-weight:500;font-size:14px;margin-left:.3em}
+.mtog{border:0;border-radius:9px;padding:8px 14px;cursor:pointer;font-weight:600;background:var(--ink);color:var(--bg)}
+.mtog[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.mdots{display:flex;gap:8px;align-items:center}
+.mdot{width:14px;height:14px;border-radius:50%;border:2px solid var(--line);background:transparent}
+.mdot.acc{width:18px;height:18px}
+.mdot.on{background:var(--accent);border-color:var(--accent)}
+.mdot.acc.on{background:var(--guide);border-color:var(--guide)}
+.mrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.mstep{width:34px;height:34px;border-radius:9px;border:1px solid var(--line);background:transparent;cursor:pointer;font-size:18px;line-height:1}
+.mbpm{font-family:var(--f-display);font-weight:800;font-size:28px;color:var(--ink);font-variant-numeric:tabular-nums;min-width:2.2em;text-align:center}
+.mterm{font-style:italic;min-width:6em}
+#mSlider{flex:1;min-width:120px}
+.fm-metro{display:inline-flex;align-items:center;gap:6px}
+.fm-metro .mdot{width:10px;height:10px}.fm-metro .mdot.acc{width:13px;height:13px}
+#fmMetro[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 .toast{position:fixed;left:0;right:0;bottom:0;z-index:60;display:flex;align-items:center;gap:10px;
   padding:12px max(16px,env(safe-area-inset-right,0px)) calc(12px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));
   background:var(--ink);color:var(--bg);font-size:14px}
@@ -263,6 +283,28 @@ section{display:flex;flex-direction:column;gap:14px}
         <button class="ghost" id="closeAll" type="button">Cover all</button>
       </div>
 
+      <div class="metro" id="metro">
+        <div class="mhead">
+          <h3>Metronome<span>节拍器</span></h3>
+          <div class="mdots" id="mDots" aria-hidden="true"></div>
+          <button type="button" class="mtog" id="mToggle" aria-pressed="false">Start</button>
+        </div>
+        <div class="mrow">
+          <button type="button" class="mstep" id="mDown" aria-label="Slower">−</button>
+          <span class="mbpm" id="mBpm">96</span>
+          <button type="button" class="mstep" id="mUp" aria-label="Faster">+</button>
+          <span>BPM</span><span class="mterm" id="mTerm">Andante</span>
+          <input type="range" id="mSlider" min="40" max="208" value="96" aria-label="Tempo in beats per minute">
+        </div>
+        <div class="mrow">
+          <label for="mBeats">Time</label>
+          <select id="mBeats"><option value="2">2/4</option><option value="3">3/4</option><option value="4" selected>4/4</option><option value="1">No accent</option></select>
+          <button type="button" class="ghost" id="mTap">Tap tempo</button>
+          <button type="button" class="ghost" id="mSong">Use song tempo</button>
+          <span>Key <kbd>M</kbd></span>
+        </div>
+      </div>
+
       <button class="fmbtn" id="fmOpen" type="button"><b>Finger mode · 手指模式</b><small>Full screen. Cover the holes with your fingers like a real recorder. Sound plays while you touch, or blow into the mic.</small></button>
 
       <div class="keys">
@@ -312,6 +354,7 @@ section{display:flex;flex-direction:column;gap:14px}
       <label for="sens" style="display:inline-flex;align-items:center;gap:6px;margin-left:8px">Sensitivity <input id="sens" type="range" min="1" max="100" value="55" style="width:80px"></label></span>
     <span style="display:inline-flex;align-items:center;gap:6px">Sync <input id="sync2" type="range" min="-300" max="800" step="10" value="0" style="width:80px" aria-label="Finger sync"> <span id="syncv2">0 ms</span></span>
     <button type="button" id="calib2">Tap to sync</button>
+    <span class="fm-metro"><button type="button" id="fmMetro" aria-pressed="false">♩ <span id="fmBpm">96</span></button><span class="mdots" id="fmDots" aria-hidden="true"></span></span>
     <span id="fmMsg">Touch the holes to play. Sound plays while any finger is down.</span>
   </div>
   <div class="fm-field" id="fmField">
@@ -564,6 +607,7 @@ const typing=e=>e.target.closest&&e.target.closest('select,input,textarea');
 window.addEventListener('keydown',e=>{
   if(e.metaKey||e.ctrlKey||e.altKey||typing(e)) return;
   if(e.code==='Space'){ e.preventDefault(); if(!e.repeat) startBlow('space'); return }
+  if(e.code==='KeyM'){ e.preventDefault(); if(!e.repeat) mToggle(); return }
   const m=keyMidi(e); if(m==null) return;
   e.preventDefault(); if(e.repeat) return;
   held.push(e.code); playMidi(m,'k:'+e.code);
@@ -574,7 +618,7 @@ window.addEventListener('keyup',e=>{
   release('k:'+e.code);
 });
 window.addEventListener('blur',()=>{held.length=0;releaseAll()});
-document.addEventListener('visibilitychange',()=>{if(document.hidden){held.length=0;stopSong();releaseAll()}});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){held.length=0;stopSong();releaseAll();if(typeof mStop==='function')mStop()}});
 
 $('sys').addEventListener('change',e=>{system=e.target.value;buildChart();changed()});
 $('vol').addEventListener('input',()=>{if(A.master)A.master.gain.setTargetAtTime(vol(),A.ctx.currentTime,0.02)});
@@ -585,13 +629,13 @@ $('closeAll').addEventListener('click',()=>{holes=[1,1,1,1,1,1,1,1];changed()});
 const parse=s=>s.trim().split(/\s+/).map(t=>{if(t==='|')return {bar:true};const [n,b]=t.split(':');return {m:toMidi(n),b:b?+b:1}});
 function toMidi(n){const mm=/^([A-G])(#?)(\d)$/.exec(n);return ({C:0,D:2,E:4,F:5,G:7,A:9,B:11})[mm[1]]+(mm[2]?1:0)+(+mm[3]+1)*12}
 const SONGS=[
- {id:'twinkle',name:'Twinkle, Twinkle',zh:'小星星',key:'1=C',tonic:72,bpm:96,
+ {id:'twinkle',beats:4,name:'Twinkle, Twinkle',zh:'小星星',key:'1=C',tonic:72,bpm:96,
   notes:parse(`C5 C5 G5 G5 | A5 A5 G5:2 | F5 F5 E5 E5 | D5 D5 C5:2 | G5 G5 F5 F5 | E5 E5 D5:2 | G5 G5 F5 F5 | E5 E5 D5:2 | C5 C5 G5 G5 | A5 A5 G5:2 | F5 F5 E5 E5 | D5 D5 C5:2`)},
- {id:'mary',name:'Mary Had a Little Lamb',zh:'玛丽有只小羊羔',key:'1=C',tonic:72,bpm:108,
+ {id:'mary',beats:4,name:'Mary Had a Little Lamb',zh:'玛丽有只小羊羔',key:'1=C',tonic:72,bpm:108,
   notes:parse(`E5 D5 C5 D5 | E5 E5 E5:2 | D5 D5 D5:2 | E5 G5 G5:2 | E5 D5 C5 D5 | E5 E5 E5 E5 | D5 D5 E5 D5 | C5:4`)},
- {id:'ode',name:'Ode to Joy',zh:'欢乐颂',key:'1=G',tonic:79,bpm:112,
+ {id:'ode',beats:4,name:'Ode to Joy',zh:'欢乐颂',key:'1=G',tonic:79,bpm:112,
   notes:parse(`B5 B5 C6 D6 | D6 C6 B5 A5 | G5 G5 A5 B5 | B5:1.5 A5:0.5 A5:2 | B5 B5 C6 D6 | D6 C6 B5 A5 | G5 G5 A5 B5 | A5:1.5 G5:0.5 G5:2 | A5 A5 B5 G5 | A5 B5:0.5 C6:0.5 B5 G5 | A5 B5:0.5 C6:0.5 B5 A5 | G5 A5 D5:2 | B5 B5 C6 D6 | D6 C6 B5 A5 | G5 G5 A5 B5 | A5:1.5 G5:0.5 G5:2`)},
- {id:'jasmine',name:'Jasmine Flower',zh:'茉莉花',key:'1=F',tonic:77,bpm:66,
+ {id:'jasmine',beats:4,name:'Jasmine Flower',zh:'茉莉花',key:'1=F',tonic:77,bpm:66,
   notes:parse(`A5 A5:0.5 C6:0.5 D6:0.5 F6:0.5 F6:0.5 D6:0.5 | C6 C6:0.5 D6:0.5 C6:2 | A5 A5:0.5 C6:0.5 D6:0.5 F6:0.5 F6:0.5 D6:0.5 | C6 C6:0.5 D6:0.5 C6:2 | C6 C6 C6 A5:0.5 C6:0.5 | D6 D6 C6:2 | A5 G5:0.5 A5:0.5 C6:0.5 A5:0.5 G5:0.5 F5:0.5 | F5 G5:0.5 F5:0.5 F5:2 | A5:0.5 G5:0.5 F5:0.5 A5:0.5 G5:1.5 A5:0.5 | C6 D6:0.5 F6:0.5 C6:2 | G5 A5:0.5 C6:0.5 G5:0.5 A5:0.5 G5:0.5 F5:0.5 | D5 F5:0.5 G5:0.5 F5:2`)}
 ];
 let song=SONGS[0], mode=null, idx=0, timer=null;
@@ -649,6 +693,7 @@ const onSync=()=>{ showSync(); try{localStorage.setItem('recorderSync',syncEl.va
 syncEl.addEventListener('input',onSync);
 sync2.addEventListener('input',()=>{ syncEl.value=sync2.value; onSync() });
 showSync();
+function audioLag(){ return (A.ctx.outputLatency||0)+(A.ctx.baseLatency||0)+(+syncEl.value)/1000 }
 // Tap to sync: play clicks on the audio clock, time the player's taps, and set the delay from the median gap.
 function calibrate(btn,say){
   ensure(); if(!A.ctx||btn.dataset.busy) return;
@@ -697,9 +742,10 @@ $('listen').addEventListener('click',()=>{
   stopSong(); ensure(); if(!A.ctx) return;
   mode='demo'; const list=playable();
   setMsg(`Listening to ${song.zh}…`);
-  const {starts,end}=scheduleSong(list,A.ctx.currentTime+0.12);
+  const t0=A.ctx.currentTime+0.12, {starts,end}=scheduleSong(list,t0);
+  if(M.on){ setBpm(song.bpm); setBeats(song.beats||4); mStart(t0) }
   A.on=true; sources.add('demo'); let shown=-1;
-  const lag=()=>(A.ctx.outputLatency||0)+(A.ctx.baseLatency||0)+(+syncEl.value)/1000;
+  const lag=audioLag;
   const frame=()=>{
     if(mode!=='demo') return;
     const heard=A.ctx.currentTime-lag();
@@ -866,6 +912,69 @@ window.addEventListener('resize',()=>{ if(!fm.hidden) layoutFM() });
 $('fmSong').addEventListener('change',e=>{ stopSong(); song=SONGS.find(s=>s.id===e.target.value); buildTabs(); buildSong(); render() });
 $('fmListen').addEventListener('click',()=>{ touches.clear(); breath(false); $('listen').click(); fmText(`Listening to ${song.zh}…`) });
 $('fmPractice').addEventListener('click',()=>{ $('practice').click(); fmText('Cover the holes with orange rings, then play.') });
+
+/* ---------- metronome ---------- */
+// Clicks are scheduled on the audio clock a little ahead (steady even if the page is busy);
+// the beat lights follow what you hear, using the same delay correction as Listen.
+const M={on:false,bpm:96,beats:4,next:0,beat:0,timer:0,raf:0,queue:[]};
+const TERMS=[[60,'Largo'],[66,'Larghetto'],[76,'Adagio'],[108,'Andante'],[120,'Moderato'],[156,'Allegro'],[176,'Vivace'],[999,'Presto']];
+try{ const v=JSON.parse(localStorage.getItem('recorderMetro')||'null'); if(v){ M.bpm=v.bpm||96; M.beats=v.beats||4 } }catch(_){}
+const saveMetro=()=>{ try{localStorage.setItem('recorderMetro',JSON.stringify({bpm:M.bpm,beats:M.beats}))}catch(_){} };
+function buildDots(){
+  ['mDots','fmDots'].forEach(id=>{ const box=$(id); box.innerHTML='';
+    for(let i=0;i<M.beats;i++){ const d=document.createElement('span'); d.className='mdot'+(i===0&&M.beats>1?' acc':''); box.appendChild(d) } });
+}
+function lightDot(b){ ['mDots','fmDots'].forEach(id=>[...$(id).children].forEach((d,i)=>d.classList.toggle('on',i===b))) }
+function mUI(){
+  $('mBpm').textContent=M.bpm; $('fmBpm').textContent=M.bpm; $('mSlider').value=M.bpm;
+  $('mTerm').textContent=TERMS.find(t=>M.bpm<t[0])[1]; $('mBeats').value=String(M.beats);
+  $('mToggle').textContent=M.on?'Stop':'Start'; $('mToggle').setAttribute('aria-pressed',M.on); $('fmMetro').setAttribute('aria-pressed',M.on);
+}
+function setBpm(v){ M.bpm=Math.max(40,Math.min(208,Math.round(v))); saveMetro(); mUI() }
+function setBeats(v){ M.beats=+v; M.beat%=M.beats; saveMetro(); buildDots(); mUI() }
+function click(t,accent){
+  const o=A.ctx.createOscillator(), g=A.ctx.createGain(); o.type='triangle'; o.frequency.value=accent?1760:1175;
+  g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(accent?0.55:0.35,t+0.002); g.gain.exponentialRampToValueAtTime(0.001,t+0.05);
+  o.connect(g); g.connect(A.master); o.start(t); o.stop(t+0.07); return o;
+}
+function mSchedule(){
+  if(!M.on) return;
+  while(M.next<A.ctx.currentTime+0.12){
+    const o=click(M.next, M.beat===0&&M.beats>1); M.queue.push({t:M.next,b:M.beat,o});
+    M.beat=(M.beat+1)%M.beats; M.next+=60/M.bpm;
+  }
+}
+function mDraw(){
+  if(!M.on) return; const heard=A.ctx.currentTime-audioLag(); let cur=null;
+  while(M.queue.length&&M.queue[0].t<=heard) cur=M.queue.shift();
+  if(cur) lightDot(cur.b);
+  M.raf=requestAnimationFrame(mDraw);
+}
+function mStart(at){
+  ensure(); if(!A.ctx) return; mStop(true);
+  M.on=true; M.beat=0; M.next=at!=null?at:A.ctx.currentTime+0.08;
+  mSchedule(); M.timer=setInterval(mSchedule,25); M.raf=requestAnimationFrame(mDraw); mUI();
+}
+function mStop(quiet){
+  clearInterval(M.timer); cancelAnimationFrame(M.raf);
+  if(A.ctx) M.queue.forEach(q=>{ if(q.t>A.ctx.currentTime) try{q.o.stop(0)}catch(_){} });
+  M.queue=[]; M.on=false; lightDot(-1); if(!quiet) mUI();
+}
+function mToggle(){ M.on?mStop():mStart() }
+let taps=[];
+$('mToggle').addEventListener('click',mToggle);
+$('fmMetro').addEventListener('click',mToggle);
+$('mDown').addEventListener('click',()=>setBpm(M.bpm-(M.bpm>120?4:2)));
+$('mUp').addEventListener('click',()=>setBpm(M.bpm+(M.bpm>=120?4:2)));
+$('mSlider').addEventListener('input',e=>setBpm(+e.target.value));
+$('mBeats').addEventListener('change',e=>setBeats(e.target.value));
+$('mSong').addEventListener('click',()=>{ setBpm(song.bpm); setBeats(song.beats||4) });
+$('mTap').addEventListener('click',()=>{
+  const now=performance.now(); if(taps.length&&now-taps[taps.length-1]>2000) taps=[];
+  taps.push(now); if(taps.length>5) taps.shift();
+  if(taps.length>=2){ const gaps=taps.slice(1).map((t,i)=>t-taps[i]); setBpm(60000/(gaps.reduce((a,b)=>a+b)/gaps.length)) }
+});
+buildDots(); mUI();
 
 drawRecorder(); buildChart(); buildTabs(); buildSong(); render();
 })();
