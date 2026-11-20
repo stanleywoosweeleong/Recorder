@@ -22,7 +22,7 @@
 /* Layout: the instrument stands upright on the left like a real 竖笛; the player's console sits beside it; fingering chart and songbook run below. */
 :root{
   --bg:#E7ECE6; --surface:#F6F9F4; --line:#C9D3CA; --ink:#17201B; --muted:#56645B;
-  --accent:#1B7461; --accent-ink:#FFFFFF; --guide:#C2681A; --soft:#DCE6DE;
+  --accent:#1B7461; --accent-ink:#FFFFFF; --guide:#C2681A; --bad:#B23A2B; --soft:#DCE6DE;
   --wood-lo:#94652F; --wood-mid:#D3A96C; --wood-hi:#F0D7A4; --hole:#2A1909; --band:#7A5323;
   --f-display:"Bricolage Grotesque","Noto Sans SC",system-ui,sans-serif;
   --f-body:"IBM Plex Sans","Noto Sans SC",system-ui,sans-serif;
@@ -30,11 +30,11 @@
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#0F1412; --surface:#17201C; --line:#2B3731; --ink:#E3EAE4; --muted:#8F9D95;
-  --accent:#4BBE9F; --accent-ink:#08120E; --guide:#EBA05A; --soft:#1F2A25;
+  --accent:#4BBE9F; --accent-ink:#08120E; --guide:#EBA05A; --bad:#EE7B66; --soft:#1F2A25;
   --hole:#180D04; --band:#6B4519; color-scheme:dark }}
 :root[data-theme="dark"]{
   --bg:#0F1412; --surface:#17201C; --line:#2B3731; --ink:#E3EAE4; --muted:#8F9D95;
-  --accent:#4BBE9F; --accent-ink:#08120E; --guide:#EBA05A; --soft:#1F2A25;
+  --accent:#4BBE9F; --accent-ink:#08120E; --guide:#EBA05A; --bad:#EE7B66; --soft:#1F2A25;
   --hole:#180D04; --band:#6B4519; color-scheme:dark }
 
 *{box-sizing:border-box}
@@ -218,6 +218,86 @@ section{display:flex;flex-direction:column;gap:14px}
 .fm-metro{display:inline-flex;align-items:center;gap:6px}
 .fm-metro .mdot{width:10px;height:10px}.fm-metro .mdot.acc{width:13px;height:13px}
 #fmMetro[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+/* settings, leaks, hand fit, breath gauge */
+.settings{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.settings fieldset{border:1px solid var(--line);border-radius:14px;background:var(--surface);padding:12px 16px 14px;display:flex;flex-direction:column;gap:10px;margin:0;min-width:0}
+.settings legend{font-family:var(--f-display);font-weight:700;font-size:16px;padding:0 6px}
+.settings label{display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.4}
+.settings label input{margin-top:2px;flex:none}
+.fp.leak{box-shadow:0 0 0 4px var(--guide)}
+.fp.leak.covered{background:color-mix(in srgb,var(--accent) 55%,var(--guide))}
+.fm-field.fitting .fp,.fm-field.fitting .fm-tube{opacity:.18}
+.fitdot{position:absolute;width:44px;height:44px;border-radius:50%;transform:translate(-50%,-50%);background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font:600 13px var(--f-mono);pointer-events:none}
+.meter{position:relative;background:linear-gradient(90deg,transparent 0 38%,color-mix(in srgb,var(--accent) 22%,transparent) 38% 62%,transparent 62%),var(--soft)}
+.meter::after{content:"";position:absolute;left:50%;top:-2px;bottom:-2px;width:2px;background:var(--accent)}
+#breathTxt{min-width:5.5em;font-weight:600}
+#breathTxt.bad{color:var(--guide)}
+/* songbook additions */
+.chip{background:transparent;color:inherit;font:inherit;cursor:pointer}
+.chip.rest .d{color:var(--muted)}
+.chip.inloop{background:color-mix(in srgb,var(--accent) 9%,transparent)}
+.chip.pick{border-color:var(--accent);border-style:dashed}
+.chip.j-perfect .d,.sn.j-perfect .hd{color:var(--accent);fill:var(--accent)}
+.chip.j-good .d,.sn.j-good .hd{color:color-mix(in srgb,var(--accent) 70%,var(--ink));fill:color-mix(in srgb,var(--accent) 70%,var(--ink))}
+.chip.j-early .d,.chip.j-late .d,.sn.j-early .hd,.sn.j-late .hd{color:var(--guide);fill:var(--guide)}
+.chip.j-wrong .d,.sn.j-wrong .hd{color:var(--bad);fill:var(--bad)}
+.chip.j-miss{opacity:.45}.chip.j-miss .d{text-decoration:line-through}
+.sn.j-miss{opacity:.4}
+.chip.j-early::after,.chip.j-late::after{font-size:9px;color:var(--guide);line-height:1}
+.chip.j-early::after{content:"early"}.chip.j-late::after{content:"late"}
+@keyframes nope{0%,100%{transform:none}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+.nope{animation:nope .2s 2}
+.staffwrap{overflow-x:auto;background:var(--bg);border-radius:10px;border:1px solid var(--line);padding:4px 0}
+#staff{display:block}
+#staff .sl{stroke:var(--ink);stroke-width:1;opacity:.75}
+#staff .stem,#staff .flag{stroke:var(--ink);stroke-width:1.3;fill:none}
+#staff .hd{fill:var(--ink);stroke:var(--ink);stroke-width:1}
+#staff .hd.hollow{fill:var(--bg)}
+#staff .dot{fill:var(--ink)}
+#staff .rest{stroke:var(--ink);stroke-width:2;fill:none}
+#staff .clef{font-size:44px;fill:var(--ink);font-family:"Apple Symbols","Noto Music","Segoe UI Symbol","Noto Sans Symbols 2",serif}
+#staff .oct{font:600 10px var(--f-body);fill:var(--ink)}
+#staff .acc{font-size:15px;fill:var(--ink);font-family:"Apple Symbols","Noto Music","Segoe UI Symbol",serif}
+#staff .tsig{font:800 17px var(--f-display);fill:var(--ink)}
+#staff .sn{cursor:pointer}
+#staff .sn.now .hd{fill:var(--guide);stroke:var(--guide)}
+#staff .sn.done{opacity:.4}
+#staff .sn.inloop .hd{stroke:var(--accent);stroke-width:2}
+.result{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline;background:var(--soft);border-radius:10px;padding:12px 14px;font-size:14px}
+.result .stars{font-size:22px;color:var(--guide);letter-spacing:2px}
+.result p{flex-basis:100%;margin:0;color:var(--muted)}
+.result .jb{font-size:12px;color:var(--muted)}
+.result .jb.j-perfect{color:var(--accent)}.result .jb.j-wrong{color:var(--bad)}.result .jb.j-early,.result .jb.j-late{color:var(--guide)}
+.tab .star{font-size:12px;color:var(--guide)}
+.tab[aria-selected="true"] .star{color:inherit}
+.warnc{color:var(--guide)}
+.addsong summary{cursor:pointer;font-weight:600;color:var(--accent);padding:4px 0}
+.songform{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:10px}
+.songform label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted)}
+.songform input,.songform textarea,.songform select{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:7px 9px;color:var(--ink);font:inherit;min-width:0}
+.songform textarea{font-family:var(--f-mono);font-size:14px}
+.songform .wide{grid-column:1/-1}
+/* tuner */
+.tuner{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px;display:flex;flex-direction:column;gap:14px}
+.tmain{display:grid;grid-template-columns:auto minmax(0,1fr);gap:20px;align-items:center}
+.tnote{display:flex;flex-direction:column;align-items:center;min-width:3.2em}
+.tnote b{font-family:var(--f-display);font-weight:800;font-size:52px;line-height:1}
+.tnote span{font-family:var(--f-display);font-size:20px;font-weight:700;margin-top:8px}
+.tscale{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+.tbar{position:relative;height:22px;border-radius:11px;background:var(--soft);border:1px solid var(--line);margin-top:4px;overflow:hidden}
+.tzone{position:absolute;left:40%;width:20%;top:0;bottom:0;background:color-mix(in srgb,var(--accent) 22%,transparent)}
+.tneedle{position:absolute;left:50%;top:-2px;bottom:-2px;width:4px;margin-left:-2px;background:var(--accent);border-radius:2px;transition:left .08s linear}
+.tneedle.off{background:var(--guide)}
+.tread{font-size:13px;color:var(--muted);margin-top:6px;font-variant-numeric:tabular-nums}
+.tread b{color:var(--ink);font-size:16px}
+.tfacts{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.tfacts div{display:flex;flex-direction:column;gap:2px}
+.tfacts span{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.tfacts b{font-family:var(--f-display);font-size:18px}
+.tmeter{display:block;height:5px;border-radius:3px;background:var(--soft);overflow:hidden;margin-top:3px}
+.tmeter i{display:block;height:100%;width:0;background:var(--accent)}
+.tmsg{margin:0;font-size:14px;color:var(--muted)}
+#tunerBtn[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
 .toast{position:fixed;left:0;right:0;bottom:0;z-index:60;display:flex;align-items:center;gap:10px;
   padding:12px max(16px,env(safe-area-inset-right,0px)) calc(12px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));
   background:var(--ink);color:var(--bg);font-size:14px}
@@ -227,6 +307,8 @@ section{display:flex;flex-direction:column;gap:14px}
 .toast[hidden]{display:none}
 .offline{font-size:12px;color:var(--muted);margin:0}
 @media (max-width:640px){
+  .tabs{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;scrollbar-width:thin}
+  .tab{flex:none}
   .stage{gap:12px}
   #rec{height:min(68vh,560px)}
   .instrument .cap{max-width:110px;font-size:11px}
@@ -244,7 +326,7 @@ section{display:flex;flex-direction:column;gap:14px}
 
 <div class="wrap">
   <header>
-    <div class="eyebrow">Soprano · C · Baroque or German fingering</div>
+    <div class="eyebrow" id="eyebrow">Soprano · C · Baroque or German fingering</div>
     <h1>Soprano Recorder<span class="zh">竖笛</span></h1>
     <p class="lede">Tap the holes to cover them, then hold <b>Blow</b> to play. Or press a note on the fingering chart, or play from the keyboard. 点击音孔按住，再按“吹奏”发声。</p>
   </header>
@@ -274,6 +356,9 @@ section{display:flex;flex-direction:column;gap:14px}
       <div class="controls">
         <label class="ctl" for="sys">Fingering
           <select id="sys"><option value="baroque">Baroque 英式</option><option value="german">German 德式</option></select>
+        </label>
+        <label class="ctl" for="inst">Recorder
+          <select id="inst"><option value="soprano">Soprano (C) 高音</option><option value="alto">Alto (F) 中音</option></select>
         </label>
         <label class="ctl" for="vol">Volume <input id="vol" type="range" min="0" max="100" value="70"></label>
         <label class="ctl" for="vib"><input id="vib" type="checkbox" checked> Vibrato</label>
@@ -324,13 +409,80 @@ section{display:flex;flex-direction:column;gap:14px}
     <div class="songbook">
       <div class="tabs" id="tabs" role="tablist"></div>
       <div class="songmeta" id="songmeta"></div>
+      <div class="row">
+        <div class="seg" id="viewSeg" role="group" aria-label="Notation">
+          <button type="button" data-view="jp">简谱</button><button type="button" data-view="staff">Staff 五线谱</button><button type="button" data-view="both">Both</button>
+        </div>
+        <div class="seg" id="inSeg" role="group" aria-label="What you play">
+          <button type="button" data-in="screen">On-screen recorder</button><button type="button" data-in="real">My real recorder 真竖笛</button>
+        </div>
+      </div>
+      <div class="staffwrap" id="staffwrap"><svg id="staff" aria-label="Staff notation"></svg></div>
       <div class="notes" id="notes"></div>
       <div class="row">
         <button class="btn" id="listen" type="button">Listen 示范</button>
         <button class="btn" id="practice" type="button">Practice 练习</button>
+        <button class="btn" id="along" type="button">Play along 跟拍</button>
+        <button class="btn alt" id="loopBtn" type="button" aria-pressed="false">Loop</button>
         <button class="btn alt" id="stop" type="button">Stop</button>
+        <label class="ctl" for="speed">Speed <input id="speed" type="range" min="40" max="120" step="5" value="100"> <span id="speedv">100%</span></label>
       </div>
-      <div class="msg" id="msg">Pick a song, then press Listen or Practice.</div>
+      <div class="msg" id="msg">Pick a song, then press Listen, Practice or Play along.</div>
+      <div class="result" id="result" hidden></div>
+      <details class="addsong">
+        <summary>Add your own song 添加歌曲</summary>
+        <form id="songForm" class="songform">
+          <label for="sfName">Name <input id="sfName" maxlength="40" placeholder="My song"></label>
+          <label for="sfKey">Key <select id="sfKey"><option value="72">1=C</option><option value="74">1=D</option><option value="77">1=F</option><option value="79" selected>1=G</option><option value="81">1=A</option><option value="82">1=B♭</option></select></label>
+          <label for="sfBpm">Tempo <input id="sfBpm" type="number" min="40" max="208" value="96"></label>
+          <label for="sfBeats">Beats per bar <select id="sfBeats"><option>2</option><option>3</option><option selected>4</option></select></label>
+          <label for="sfPick">Pickup beats <input id="sfPick" type="number" min="0" max="3" step="0.5" value="0"></label>
+          <label for="sfNotes" class="wide">Notes in 简谱 <textarea id="sfNotes" rows="4" placeholder="3 2 1- | 3 2 1- | 1_ 1_ 1_ 1_ 2_ 2_ 2_ 2_ | 3 2 1- |"></textarea></label>
+          <p class="tip wide"><b>1–7</b> notes, <b>0</b> rest. <b>'</b> after a note goes up an octave (1'), <b>,</b> goes down (5,). <b>#</b> or <b>b</b> before means sharp or flat (#4, b7). Each <b>-</b> adds a beat (5- is 2 beats). <b>_</b> is half a beat (3_), <b>__</b> a quarter. <b>.</b> dots a note (5. is 1½ beats). <b>|</b> is a bar line. Put spaces between notes.</p>
+          <div class="wide row"><button class="btn" type="submit">Save song</button><span class="tip" id="sfErr"></span></div>
+        </form>
+      </details>
+    </div>
+  </section>
+
+  <section id="realSec">
+    <div class="sechead"><h2>Real recorder<span class="zh">真竖笛 · 调音</span></h2><span class="tip">Play your own recorder near the phone. The app hears each note, shows how in tune and steady it is, and shows its fingering on the recorder above. To practise songs with it, choose “My real recorder” in the songbook.</span></div>
+    <div class="tuner">
+      <div class="row"><button class="btn" id="tunerBtn" type="button" aria-pressed="false">Start listening</button><span class="tip" id="tStatus">Uses the microphone. Nothing is recorded or sent anywhere.</span></div>
+      <div class="tmain">
+        <div class="tnote"><b id="tNote">–</b><span id="tJp"></span></div>
+        <div class="tgauge">
+          <div class="tscale"><span>−50</span><span>flat</span><span>0</span><span>sharp</span><span>+50</span></div>
+          <div class="tbar"><i class="tzone"></i><i class="tneedle" id="tNeedle"></i></div>
+          <div class="tread"><b id="tCents">–</b> cents · <span id="tHz">–</span> Hz</div>
+        </div>
+      </div>
+      <div class="tfacts">
+        <div><span>Tuning</span><b id="tTune">–</b></div>
+        <div><span>Steadiness</span><b id="tSteady">–</b><i class="tmeter"><i id="tSteadyBar"></i></i></div>
+        <div><span>Note start</span><b id="tAttack">–</b></div>
+        <div><span>Notes heard</span><b id="tCount">0</b></div>
+      </div>
+      <p class="tmsg" id="tMsg">Tip: hold a G (thumb and holes 1–3) with a gentle, steady breath and watch the needle.</p>
+    </div>
+  </section>
+
+  <section id="settingsSec">
+    <div class="sechead"><h2>Settings<span class="zh">设置</span></h2></div>
+    <div class="settings">
+      <fieldset>
+        <legend>Vibration 振动</legend>
+        <label for="hapHole"><input type="checkbox" id="hapHole"> Tick when a finger lands on a hole in Finger mode, and buzz if it is off-centre</label>
+        <label for="hapMetro"><input type="checkbox" id="hapMetro"> Feel the metronome: a pulse on every beat, stronger on beat 1</label>
+        <label for="hapWrong"><input type="checkbox" id="hapWrong"> Buzz when you play a wrong note in practice</label>
+        <p class="tip" id="hapStatus"></p>
+      </fieldset>
+      <fieldset>
+        <legend>Finger mode 手指模式</legend>
+        <label for="leakOn"><input type="checkbox" id="leakOn"> Off-centre fingers leak, like a real hole: the note goes sharp and hissy, and the hole glows orange</label>
+        <p class="tip">Press <b>Fit to hand</b> in Finger mode and touch where each finger naturally rests. The holes move to fit your hand, so you can play by feel.</p>
+        <button class="ghost" id="fitResetAll" type="button">Reset all hand layouts</button>
+      </fieldset>
     </div>
   </section>
   <p class="offline" id="offline">Open once online to save the app for offline use.</p>
@@ -350,11 +502,14 @@ section{display:flex;flex-direction:column;gap:14px}
     <select id="fmSong" aria-label="Song"></select>
     <button type="button" id="fmListen">Listen</button>
     <button type="button" id="fmPractice">Practice</button>
-    <span id="fmMic" hidden><span style="display:inline-flex;align-items:center;gap:6px">Breath <span class="meter" id="meter"><i></i></span></span>
+    <button type="button" id="fmAlong">Play along</button>
+    <span id="fmMic" hidden><span style="display:inline-flex;align-items:center;gap:6px">Breath <span class="meter" id="meter"><i></i></span><span id="breathTxt">–</span></span>
       <label for="sens" style="display:inline-flex;align-items:center;gap:6px;margin-left:8px">Sensitivity <input id="sens" type="range" min="1" max="100" value="55" style="width:80px"></label></span>
     <span style="display:inline-flex;align-items:center;gap:6px">Sync <input id="sync2" type="range" min="-300" max="800" step="10" value="0" style="width:80px" aria-label="Finger sync"> <span id="syncv2">0 ms</span></span>
     <button type="button" id="calib2">Tap to sync</button>
     <span class="fm-metro"><button type="button" id="fmMetro" aria-pressed="false">♩ <span id="fmBpm">96</span></button><span class="mdots" id="fmDots" aria-hidden="true"></span></span>
+    <button type="button" id="fmFit">Fit to hand</button>
+    <button type="button" id="fmFitReset" hidden>Standard layout</button>
     <span id="fmMsg">Touch the holes to play. Sound plays while any finger is down.</span>
   </div>
   <div class="fm-field" id="fmField">
@@ -370,43 +525,54 @@ const SOLF={0:'do',2:'re',4:'mi',5:'fa',7:'sol',9:'la',11:'si'};
 const JP={0:'1',1:'♯1',2:'2',3:'♯2',4:'3',5:'4',6:'♯4',7:'5',8:'♯5',9:'6',10:'♯6',11:'7'};
 // Fingerings: thumb, then holes 1–7 (left hand 1–3, right hand 4–7). 1 covered, 0 open, h half.
 const BAROQUE={72:'11111111',73:'1111111h',74:'11111110',75:'111111h0',76:'11111100',77:'11111011',78:'11110110',
-  79:'11110000',80:'11101110',81:'11100000',82:'11011000',83:'11000000',84:'10100000',85:'01100000',86:'00100000',
+  79:'11110000',80:'111011h0',81:'11100000',82:'11011000',83:'11000000',84:'10100000',85:'01100000',86:'00100000',
   87:'00111110',88:'h1111100',89:'h1111010',90:'h1110100',91:'h1110000',92:'h1101000',93:'h1100000',94:'h1101110',
-  95:'h1101100',96:'h1001100'};
+  95:'h1101100',96:'h1001100',97:'h1011011',98:'h101101h'};
+// Checked against Wikipedia's basic fingering table and recorderhomepage.net. Accepted alternatives:
+const ALT={80:['11101110']};
 const GERMAN=Object.assign({},BAROQUE,{77:'11111000',78:'11110111'});
-const LO=72, HI=96;
+let LO=72, HI=98, inst='soprano', TB=null;
 const enc=v=>v===2?'h':String(v), dec=c=>c==='h'?2:+c;
+// Alto (in F) uses the same fingerings as soprano, sounding a fifth lower.
+function mkTable(base,off){const t={};for(const m in base)t[+m+off]=base[m];return t}
+function rebuildTables(){const off=inst==='alto'?-7:0;TB={baroque:mkTable(BAROQUE,off),german:mkTable(GERMAN,off),alt:{}};for(const m in ALT)TB.alt[+m+off]=ALT[m];LO=72+off;HI=98+off}
+try{ if(localStorage.getItem('recorderInst')==='alto') inst='alto' }catch(_){}
+rebuildTables();
 
 let system='baroque';
-const table=()=>system==='baroque'?BAROQUE:GERMAN;
+const table=()=>TB[system], otherTable=()=>TB[system==='baroque'?'german':'baroque'];
 let holes=[1,1,1,1,1,1,1,1];
 
-const label=m=>NAMES[m%12]+(m>=96?'″':m>=84?'′':'');
+const label=m=>NAMES[m%12]+(m>=96?'″':m>=84?'′':m<72?',':'');
 const sci=m=>NAMES[m%12]+(Math.floor(m/12)-1);
 const freq=m=>440*Math.pow(2,(m-69)/12);
 function jianpu(m,tonic=72){const r=m-tonic;const o=Math.floor(r/12);const d=((r%12)+12)%12;return `<span class="jpn" data-o="${o}">${JP[d]}</span>`}
 
 function lookup(h){
   const k=h.map(enc).join('');
-  for(const t of [table(), system==='baroque'?GERMAN:BAROQUE]){
+  for(const t of [table(), otherTable()]){
     for(const m in t) if(t[m]===k) return {midi:+m,approx:false,alt:t!==table()};
   }
+  for(const m in TB.alt) if(TB.alt[m].includes(k)) return {midi:+m,approx:false,altf:true};
   // Rough guess for non-standard fingerings: the highest open finger hole sets the pitch.
   let k1=8; for(let i=1;i<=7;i++){ if(h[i]===0){k1=i;break} }
-  const base={1:84,2:83,3:81,4:79,5:77,6:76,7:74,8:72}[k1];
+  const base={1:84,2:83,3:81,4:79,5:77,6:76,7:74,8:72}[k1]+(LO-72);
   let m=base;
   if(h[0]===2) m=base+12;
-  else if(h[0]===0) m=h[1]===0?86:85;
+  else if(h[0]===0) m=(h[1]===0?86:85)+(LO-72);
   return {midi:Math.min(Math.max(m,LO),HI),approx:true};
 }
 const cur=()=>lookup(holes);
 
 /* ---------- audio ---------- */
+// iOS 17+: 'playback' keeps sound on with the ring/silent switch off; 'play-and-record' while the mic is in use.
+function setSession(t){ try{ if(navigator.audioSession) navigator.audioSession.type=t }catch(_){} }
 const A={ctx:null,on:false};
 function ensure(){
   if(A.ctx){ if(A.ctx.state==='suspended') A.ctx.resume(); return; }
   const C=window.AudioContext||window.webkitAudioContext; if(!C) return;
-  const ctx=new C(); A.ctx=ctx;
+  let ctx; try{ ctx=new C({latencyHint:'interactive'}) }catch(_){ ctx=new C() } A.ctx=ctx;
+  setSession('playback');
   const comp=ctx.createDynamicsCompressor(); comp.threshold.value=-14; comp.ratio.value=3; comp.connect(ctx.destination);
   A.master=ctx.createGain(); A.master.gain.value=vol(); A.master.connect(comp);
   const real=new Float32Array([0,0,0,0,0,0,0,0]);
@@ -426,13 +592,14 @@ function ensure(){
   A.osc.start(); A.lfo.start(); A.noise.start();
 }
 function vol(){const v=+document.getElementById('vol').value/100; return v*v}
-const level=m=>0.32*(1-(m-72)*0.012);
+const level=m=>0.32*(1-(m-LO)*0.012);
+const lpMul=m=>Math.max(3.2,6.2-(m-LO)*0.12);   // low notes richer, high notes purer
 function hold(p,t){p.cancelScheduledValues(t);p.setValueAtTime(p.value,t)}
 function setPitch(m,t,tc){
   const f=freq(m);
-  if(tc){A.osc.frequency.setTargetAtTime(f,t,tc);A.lp.frequency.setTargetAtTime(f*5,t,tc);A.bp.frequency.setTargetAtTime(f*2.2,t,tc)}
+  if(tc){A.osc.frequency.setTargetAtTime(f,t,tc);A.lp.frequency.setTargetAtTime(f*lpMul(m),t,tc);A.bp.frequency.setTargetAtTime(f*2.2,t,tc)}
   else{hold(A.osc.frequency,t);A.osc.frequency.setValueAtTime(f*0.988,t);A.osc.frequency.setTargetAtTime(f,t,0.012);
-    A.lp.frequency.setValueAtTime(f*5,t);A.bp.frequency.setValueAtTime(f*2.2,t)}
+    A.lp.frequency.setValueAtTime(f*lpMul(m),t);A.bp.frequency.setValueAtTime(f*2.2,t)}
 }
 function chiff(t){hold(A.ng.gain,t);A.ng.gain.linearRampToValueAtTime(0.10,t+0.008);A.ng.gain.setTargetAtTime(0.014,t+0.01,0.035)}
 function vibrato(t){hold(A.lfoG.gain,t);A.lfoG.gain.setValueAtTime(0,t);
@@ -440,13 +607,30 @@ function vibrato(t){hold(A.lfoG.gain,t);A.lfoG.gain.setValueAtTime(0,t);
 function soundOn(m){
   if(!A.ctx) return; const t=A.ctx.currentTime;
   setPitch(m,t,0); hold(A.g.gain,t); A.g.gain.setValueAtTime(0,t); A.g.gain.linearRampToValueAtTime(level(m),t+0.035);
-  chiff(t); vibrato(t); A.on=true;
+  hold(A.osc.detune,t); A.osc.detune.setValueAtTime(0,t);
+  chiff(t); vibrato(t); A.on=true; A.base=A.pm=m; A.onAt=t; BR.squeak=false;
 }
-function soundGlide(m){ if(!A.ctx||!A.on) return; const t=A.ctx.currentTime; setPitch(m,t,0.007); hold(A.g.gain,t); A.g.gain.setTargetAtTime(level(m),t,0.02) }
+function soundGlide(m){ if(!A.ctx||!A.on) return; const t=A.ctx.currentTime; A.base=A.pm=m; BR.squeak=false; setPitch(m,t,0.007); hold(A.g.gain,t); A.g.gain.setTargetAtTime(level(m),t,0.02); applyBreath() }
 function soundTongue(m){
   if(!A.ctx) return; if(!A.on) return soundOn(m);
   const t=A.ctx.currentTime; hold(A.g.gain,t); A.g.gain.linearRampToValueAtTime(level(m)*0.05,t+0.025);
   setPitch(m,t+0.025,0); A.g.gain.linearRampToValueAtTime(level(m),t+0.06); chiff(t+0.025); vibrato(t+0.025);
+  A.base=A.pm=m; A.onAt=t+0.06; BR.squeak=false;
+}
+// Breath and leaks. BR.r is breath relative to what the note needs (1 = just right); BR.leak counts holes
+// that are only partly covered. More breath goes sharp and louder, then a low note overblows (squeaks up
+// an octave); too little goes flat, quiet and airy. A leaky hole goes sharp and hissy.
+const BR={r:1,leak:0,squeak:false};
+function applyBreath(){
+  if(!A.ctx||!A.on||A.base==null) return;
+  const t=A.ctx.currentTime, base=A.base, r=BR.r;
+  const lim=base<LO+7?1.75:base<LO+12?2.1:99;
+  if(!BR.squeak&&r>lim) BR.squeak=true; else if(BR.squeak&&r<lim*0.85) BR.squeak=false;
+  const m=base+(BR.squeak?12:0);
+  if(m!==A.pm){ A.pm=m; setPitch(m,t,0.004) }
+  A.osc.detune.setTargetAtTime(Math.max(-45,Math.min(45,(r-1)*32))+BR.leak*28,t,0.04);
+  if(t>A.onAt+0.04) A.g.gain.setTargetAtTime(level(m)*Math.max(0.22,Math.min(1.25,0.3+0.7*r))*(BR.leak?0.85:1),t,0.03);
+  A.ng.gain.setTargetAtTime(0.014+(r<0.6?(0.6-r)*0.15:0)+(r>1.35?(r-1.35)*0.04:0)+BR.leak*0.05+(BR.squeak?0.03:0),t,0.03);
 }
 function soundOff(){ if(!A.ctx) return; const t=A.ctx.currentTime;
   hold(A.g.gain,t); A.g.gain.setTargetAtTime(0,t,0.03); hold(A.ng.gain,t); A.ng.gain.setTargetAtTime(0,t,0.03);
@@ -517,25 +701,52 @@ let lastMidi=null;
 const blowing=()=>sources.size>0;
 function changed(){
   const n=cur();
-  if(blowing() && n.midi!==lastMidi){ soundGlide(n.midi); lastMidi=n.midi; onset(n.midi) }
+  if(blowing() && n.midi!==lastMidi){ soundGlide(n.midi); lastMidi=n.midi; onset(n.midi,'glide') }
   render();
 }
 function setFingering(m){ holes=[...table()[m]].map(dec) }
 function startBlow(src){
   ensure(); const was=blowing(); sources.add(src);
-  if(!was){ const n=cur(); soundOn(n.midi); lastMidi=n.midi; onset(n.midi) }
+  if(!was){ const n=cur(); soundOn(n.midi); lastMidi=n.midi; onset(n.midi,'start') }
   render();
 }
 function playMidi(m,src){
   ensure(); setFingering(m); const was=blowing(); sources.add(src);
   if(was) soundTongue(m); else soundOn(m);
-  lastMidi=m; onset(m); render();
+  lastMidi=m; onset(m,'start'); render();
 }
 function release(src){ if(!sources.delete(src)) return; if(!blowing()){ soundOff(); lastMidi=null } render() }
 function releaseAll(){ sources.clear(); soundOff(); lastMidi=null; render() }
 
 /* ---------- readout & chart ---------- */
 const $=id=>document.getElementById(id);
+
+/* ---------- options & vibration ---------- */
+const OPT={hole:true,metro:false,wrong:true,leak:true};
+try{ Object.assign(OPT,JSON.parse(localStorage.getItem('recorderOpts')||'{}')) }catch(_){}
+const saveOpt=()=>{ try{localStorage.setItem('recorderOpts',JSON.stringify(OPT))}catch(_){} };
+const canVib=typeof navigator.vibrate==='function';
+const isIOS=/iP(hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+let iosSw=null;
+// iPhone browsers have no vibration API. On iOS 18, toggling a switch-style checkbox through its label
+// plays a light haptic tap, and only during a touch, so it can give the hole tick but not timed pulses.
+function iosTick(){
+  try{
+    if(!iosSw){ iosSw=document.createElement('label'); iosSw.setAttribute('aria-hidden','true');
+      iosSw.style.cssText='position:fixed;left:-50px;top:0;width:1px;height:1px;opacity:0;pointer-events:none;overflow:hidden';
+      iosSw.innerHTML='<input type="checkbox" switch tabindex="-1">'; document.body.appendChild(iosSw) }
+    iosSw.click();
+  }catch(_){}
+}
+function buzz(kind,pattern){
+  if(!OPT[kind]) return;
+  if(A.ctx) A.gateUntil=A.ctx.currentTime+0.15;
+  if(canVib){ try{ navigator.vibrate(pattern) }catch(_){} } else if(isIOS) iosTick();
+}
+[['hapHole','hole'],['hapMetro','metro'],['hapWrong','wrong'],['leakOn','leak']].forEach(([id,k])=>{
+  const c=$(id); c.checked=!!OPT[k]; c.addEventListener('change',()=>{ OPT[k]=c.checked; saveOpt(); if(c.checked&&k!=='leak') buzz(k,30) });
+});
+$('hapStatus').textContent=canVib?'This phone can vibrate.':isIOS?'iPhone: only the hole tick works, as a light tap on iOS 18 or later. Metronome pulses and wrong-note buzzes need an Android phone.':'This browser cannot vibrate. Vibration works on Android phones.';
 function render(){
   const n=cur(), m=n.midi;
   $('big').textContent=(n.approx?'≈':'')+label(m);
@@ -545,7 +756,7 @@ function render(){
   $('sci').textContent=sci(m);
   $('hz').textContent=freq(m).toFixed(1);
   const st=$('status');
-  st.textContent=n.approx?'Non-standard fingering, pitch is a rough guess':n.alt?(system==='baroque'?'German fingering for this note':'Baroque fingering for this note'):(blowing()?'Playing':'Standard fingering');
+  st.textContent=n.approx?'Non-standard fingering, pitch is a rough guess':n.altf?'Alternative fingering':n.alt?(system==='baroque'?'German fingering for this note':'Baroque fingering for this note'):(blowing()?'Playing':'Standard fingering');
   st.classList.toggle('warn',n.approx);
   $('blow').classList.toggle('on',blowing());
   document.querySelectorAll('.hole').forEach(g=>{
@@ -618,70 +829,242 @@ window.addEventListener('keyup',e=>{
   release('k:'+e.code);
 });
 window.addEventListener('blur',()=>{held.length=0;releaseAll()});
-document.addEventListener('visibilitychange',()=>{if(document.hidden){held.length=0;stopSong();releaseAll();if(typeof mStop==='function')mStop()}});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){held.length=0;stopSong();releaseAll();if(typeof mStop==='function')mStop();if(typeof tunerStop==='function')tunerStop()}});
 
 $('sys').addEventListener('change',e=>{system=e.target.value;buildChart();changed()});
+$('inst').value=inst;
+$('inst').addEventListener('change',e=>{
+  inst=e.target.value; try{localStorage.setItem('recorderInst',inst)}catch(_){}
+  rebuildTables(); releaseAll(); holes=[1,1,1,1,1,1,1,1]; buildChart(); if(typeof buildSong==='function') buildSong(); changed();
+  $('eyebrow').textContent=inst==='alto'?'Alto · F · Baroque or German fingering':'Soprano · C · Baroque or German fingering';
+});
 $('vol').addEventListener('input',()=>{if(A.master)A.master.gain.setTargetAtTime(vol(),A.ctx.currentTime,0.02)});
 $('openAll').addEventListener('click',()=>{holes=[0,0,0,0,0,0,0,0];changed()});
 $('closeAll').addEventListener('click',()=>{holes=[1,1,1,1,1,1,1,1];changed()});
 
 /* ---------- songs ---------- */
-const parse=s=>s.trim().split(/\s+/).map(t=>{if(t==='|')return {bar:true};const [n,b]=t.split(':');return {m:toMidi(n),b:b?+b:1}});
+// Built-in songs use "C5:1" tokens (note:beats), "R:1" for a rest and "|" for a bar line.
+// Your own songs are typed in 简谱 and converted by parseJianpu().
+const parse=s=>s.trim().split(/\s+/).map(t=>{if(t==='|')return {bar:true};const [n,b]=t.split(':');return n==='R'?{rest:true,b:+b||1}:{m:toMidi(n),b:b?+b:1}});
 function toMidi(n){const mm=/^([A-G])(#?)(\d)$/.exec(n);return ({C:0,D:2,E:4,F:5,G:7,A:9,B:11})[mm[1]]+(mm[2]?1:0)+(+mm[3]+1)*12}
-const SONGS=[
- {id:'twinkle',beats:4,name:'Twinkle, Twinkle',zh:'小星星',key:'1=C',tonic:72,bpm:96,
-  notes:parse(`C5 C5 G5 G5 | A5 A5 G5:2 | F5 F5 E5 E5 | D5 D5 C5:2 | G5 G5 F5 F5 | E5 E5 D5:2 | G5 G5 F5 F5 | E5 E5 D5:2 | C5 C5 G5 G5 | A5 A5 G5:2 | F5 F5 E5 E5 | D5 D5 C5:2`)},
- {id:'mary',beats:4,name:'Mary Had a Little Lamb',zh:'玛丽有只小羊羔',key:'1=C',tonic:72,bpm:108,
-  notes:parse(`E5 D5 C5 D5 | E5 E5 E5:2 | D5 D5 D5:2 | E5 G5 G5:2 | E5 D5 C5 D5 | E5 E5 E5 E5 | D5 D5 E5 D5 | C5:4`)},
- {id:'ode',beats:4,name:'Ode to Joy',zh:'欢乐颂',key:'1=G',tonic:79,bpm:112,
-  notes:parse(`B5 B5 C6 D6 | D6 C6 B5 A5 | G5 G5 A5 B5 | B5:1.5 A5:0.5 A5:2 | B5 B5 C6 D6 | D6 C6 B5 A5 | G5 G5 A5 B5 | A5:1.5 G5:0.5 G5:2 | A5 A5 B5 G5 | A5 B5:0.5 C6:0.5 B5 G5 | A5 B5:0.5 C6:0.5 B5 A5 | G5 A5 D5:2 | B5 B5 C6 D6 | D6 C6 B5 A5 | G5 G5 A5 B5 | A5:1.5 G5:0.5 G5:2`)},
- {id:'jasmine',beats:4,name:'Jasmine Flower',zh:'茉莉花',key:'1=F',tonic:77,bpm:66,
-  notes:parse(`A5 A5:0.5 C6:0.5 D6:0.5 F6:0.5 F6:0.5 D6:0.5 | C6 C6:0.5 D6:0.5 C6:2 | A5 A5:0.5 C6:0.5 D6:0.5 F6:0.5 F6:0.5 D6:0.5 | C6 C6:0.5 D6:0.5 C6:2 | C6 C6 C6 A5:0.5 C6:0.5 | D6 D6 C6:2 | A5 G5:0.5 A5:0.5 C6:0.5 A5:0.5 G5:0.5 F5:0.5 | F5 G5:0.5 F5:0.5 F5:2 | A5:0.5 G5:0.5 F5:0.5 A5:0.5 G5:1.5 A5:0.5 | C6 D6:0.5 F6:0.5 C6:2 | G5 A5:0.5 C6:0.5 G5:0.5 A5:0.5 G5:0.5 F5:0.5 | D5 F5:0.5 G5:0.5 F5:2`)}
+const BUILTIN=[
+ {id:'hotcross',name:'Hot Cross Buns',zh:'热十字面包',key:'1=G',tonic:79,bpm:100,beats:4,
+  src:`B5 A5 G5:2 | B5 A5 G5:2 | G5:0.5 G5:0.5 G5:0.5 G5:0.5 A5:0.5 A5:0.5 A5:0.5 A5:0.5 | B5 A5 G5:2`},
+ {id:'twinkle',name:'Twinkle, Twinkle',zh:'小星星',key:'1=C',tonic:72,bpm:96,beats:4,
+  src:`C5 C5 G5 G5 | A5 A5 G5:2 | F5 F5 E5 E5 | D5 D5 C5:2 | G5 G5 F5 F5 | E5 E5 D5:2 | G5 G5 F5 F5 | E5 E5 D5:2 | C5 C5 G5 G5 | A5 A5 G5:2 | F5 F5 E5 E5 | D5 D5 C5:2`},
+ {id:'mary',name:'Mary Had a Little Lamb',zh:'玛丽有只小羊羔',key:'1=C',tonic:72,bpm:108,beats:4,
+  src:`E5 D5 C5 D5 | E5 E5 E5:2 | D5 D5 D5:2 | E5 G5 G5:2 | E5 D5 C5 D5 | E5 E5 E5 E5 | D5 D5 E5 D5 | C5:4`},
+ {id:'bee',name:'Lightly Row',zh:'小蜜蜂',key:'1=C',tonic:72,bpm:108,beats:4,
+  src:`G5 E5 E5:2 | F5 D5 D5:2 | C5 D5 E5 F5 | G5 G5 G5:2 | G5 E5 E5:2 | F5 D5 D5:2 | C5 E5 G5 G5 | E5:4 | D5 D5 D5 D5 | D5 E5 F5:2 | E5 E5 E5 E5 | E5 F5 G5:2 | G5 E5 E5:2 | F5 D5 D5:2 | C5 E5 G5 G5 | C5:4`},
+ {id:'tigers',name:'Frère Jacques',zh:'两只老虎',key:'1=F',tonic:77,bpm:112,beats:4,
+  src:`F5 G5 A5 F5 | F5 G5 A5 F5 | A5 A#5 C6:2 | A5 A#5 C6:2 | C6:0.5 D6:0.5 C6:0.5 A#5:0.5 A5 F5 | C6:0.5 D6:0.5 C6:0.5 A#5:0.5 A5 F5 | F5 C5 F5:2 | F5 C5 F5:2`},
+ {id:'london',name:'London Bridge',zh:'伦敦桥',key:'1=C',tonic:72,bpm:104,beats:4,
+  src:`G5:1.5 A5:0.5 G5 F5 | E5 F5 G5:2 | D5 E5 F5:2 | E5 F5 G5:2 | G5:1.5 A5:0.5 G5 F5 | E5 F5 G5:2 | D5:2 G5:2 | E5 C5:3`},
+ {id:'ode',name:'Ode to Joy',zh:'欢乐颂',key:'1=G',tonic:79,bpm:112,beats:4,
+  src:`B5 B5 C6 D6 | D6 C6 B5 A5 | G5 G5 A5 B5 | B5:1.5 A5:0.5 A5:2 | B5 B5 C6 D6 | D6 C6 B5 A5 | G5 G5 A5 B5 | A5:1.5 G5:0.5 G5:2 | A5 A5 B5 G5 | A5 B5:0.5 C6:0.5 B5 G5 | A5 B5:0.5 C6:0.5 B5 A5 | G5 A5 D5:2 | B5 B5 C6 D6 | D6 C6 B5 A5 | G5 G5 A5 B5 | A5:1.5 G5:0.5 G5:2`},
+ {id:'jingle',name:'Jingle Bells',zh:'铃儿响叮当',key:'1=C',tonic:72,bpm:120,beats:4,
+  src:`E5 E5 E5:2 | E5 E5 E5:2 | E5 G5 C5:1.5 D5:0.5 | E5:4 | F5 F5 F5:1.5 F5:0.5 | F5 E5 E5 E5:0.5 E5:0.5 | E5 D5 D5 E5 | D5:2 G5:2 | E5 E5 E5:2 | E5 E5 E5:2 | E5 G5 C5:1.5 D5:0.5 | E5:4 | F5 F5 F5 F5 | F5 E5 E5 E5:0.5 E5:0.5 | G5 G5 F5 D5 | C5:4`},
+ {id:'birthday',name:'Happy Birthday',zh:'生日快乐',key:'1=F',tonic:77,bpm:100,beats:3,pickup:1,
+  src:`C5:0.75 C5:0.25 | D5 C5 F5 | E5:2 C5:0.75 C5:0.25 | D5 C5 G5 | F5:2 C5:0.75 C5:0.25 | C6 A5 F5 | E5 D5 A#5:0.75 A#5:0.25 | A5 F5 G5 | F5:3`},
+ {id:'amazing',name:'Amazing Grace',zh:'奇异恩典',key:'1=F',tonic:77,bpm:84,beats:3,pickup:1,
+  src:`C5 | F5:2 A5:0.5 F5:0.5 | A5:2 G5 | F5:2 D5 | C5:2 C5 | F5:2 A5:0.5 F5:0.5 | A5:2 G5:0.5 A5:0.5 | C6:3 | C6:2 A5:0.5 C6:0.5 | C6:2 A5:0.5 F5:0.5 | A5:2 G5 | F5:2 D5 | C5:2 C5 | F5:2 A5:0.5 F5:0.5 | A5:2 G5 | F5:3`},
+ {id:'jasmine',name:'Jasmine Flower',zh:'茉莉花',key:'1=F',tonic:77,bpm:66,beats:4,
+  src:`A5 A5:0.5 C6:0.5 D6:0.5 F6:0.5 F6:0.5 D6:0.5 | C6 C6:0.5 D6:0.5 C6:2 | A5 A5:0.5 C6:0.5 D6:0.5 F6:0.5 F6:0.5 D6:0.5 | C6 C6:0.5 D6:0.5 C6:2 | C6 C6 C6 A5:0.5 C6:0.5 | D6 D6 C6:2 | A5 G5:0.5 A5:0.5 C6:0.5 A5:0.5 G5:0.5 F5:0.5 | F5 G5:0.5 F5:0.5 F5:2 | A5:0.5 G5:0.5 F5:0.5 A5:0.5 G5:1.5 A5:0.5 | C6 D6:0.5 F6:0.5 C6:2 | G5 A5:0.5 C6:0.5 G5:0.5 A5:0.5 G5:0.5 F5:0.5 | D5 F5:0.5 G5:0.5 F5:2`},
+ {id:'farewell',name:'Farewell',zh:'送别',key:'1=F',tonic:77,bpm:72,beats:4,
+  src:`C6 A5:0.5 C6:0.5 F6:2 | D6 F6 C6:2 | C6 F5:0.5 G5:0.5 A5 G5:0.5 F5:0.5 | G5:4 | C6 A5:0.5 C6:0.5 F6:1.5 E6:0.5 | D6 F6 C6:2 | C6 G5:0.5 A5:0.5 A#5:1.5 E5:0.5 | F5:4 | D6 F6 F6:2 | E6 D6:0.5 E6:0.5 F6:2 | D6:0.5 E6:0.5 F6:0.5 D6:0.5 D6:0.5 C6:0.5 A5:0.5 F5:0.5 | G5:4 | C6 A5:0.5 C6:0.5 F6:1.5 E6:0.5 | D6 F6 C6:2 | C6 G5:0.5 A5:0.5 A#5:1.5 E5:0.5 | F5:4`}
 ];
+BUILTIN.forEach(s=>{ s.notes=parse(s.src); s.pickup=s.pickup||0 });
+
+// 简谱 for your own songs: 1–7 notes, 0 rest; ' up an octave, , down; # or b before; - adds a beat,
+// _ halves (__ quarter), . dots; | bar line.
+const DEG={1:0,2:2,3:4,4:5,5:7,6:9,7:11};
+function parseJianpu(text,tonic){
+  const out=[], errs=[];
+  text.replace(/｜/g,'|').trim().split(/\s+/).filter(Boolean).forEach(t=>{
+    if(/^\|+$/.test(t)){ out.push({bar:true}); return }
+    const mm=/^([#b♯♭]?)([0-7])(['’,，]*)([-_.]*)$/.exec(t);
+    if(!mm){ errs.push(t); return }
+    let b=1; const mods=mm[4];
+    for(const c of mods) if(c==='_') b/=2;
+    if(mods.includes('.')) b*=1.5;
+    b+=(mods.match(/-/g)||[]).length;
+    if(mm[2]==='0'){ out.push({rest:true,b}); return }
+    const acc=mm[1]==='#'||mm[1]==='♯'?1:mm[1]==='b'||mm[1]==='♭'?-1:0;
+    const oct=(mm[3].match(/['’]/g)||[]).length-(mm[3].match(/[,，]/g)||[]).length;
+    out.push({m:tonic+DEG[mm[2]]+acc+12*oct,b});
+  });
+  return {notes:out,errs};
+}
+let CUSTOM=[];
+try{ CUSTOM=JSON.parse(localStorage.getItem('recorderSongs')||'[]')||[] }catch(_){}
+CUSTOM.forEach(s=>{ s.notes=parseJianpu(s.src,s.tonic).notes; s.custom=true; s.zh=s.zh||'' });
+const saveCustom=()=>{ try{localStorage.setItem('recorderSongs',JSON.stringify(CUSTOM.map(({notes,custom,...r})=>r)))}catch(_){} };
+let SONGS=BUILTIN.concat(CUSTOM);
+let BEST={};
+try{ BEST=JSON.parse(localStorage.getItem('recorderBest')||'{}')||{} }catch(_){}
+
 let song=SONGS[0], mode=null, idx=0, timer=null;
-const playable=()=>song.notes.filter(n=>!n.bar);
-function target(){ return mode==='practice'&&idx<playable().length?playable()[idx].m:null }
+let P={list:[],i:0}, TL=null, J=null, loopSel=null, loopPick=null, view='jp', inputSrc='screen';
+try{ const v=JSON.parse(localStorage.getItem('recorderView')||'{}'); if(v.view) view=v.view; if(v.input) inputSrc=v.input }catch(_){}
+const saveView=()=>{ try{localStorage.setItem('recorderView',JSON.stringify({view,input:inputSrc}))}catch(_){} };
+const evAll=()=>song.notes.filter(n=>!n.bar);                 // notes and rests, in chip order
+const segRange=()=>loopSel||[0,evAll().length-1];
+const playable=()=>{ const [a,b]=segRange(); return evAll().map((n,k)=>({...n,k})).filter(n=>!n.rest&&n.k>=a&&n.k<=b) };
+const beatAt=k=>{ let x=0; const e=evAll(); for(let i=0;i<k;i++) x+=e[i].b; return x };
+const speed=()=>+$('speed').value/100;
+const flatKeyOf=s=>[5,10,3].includes(((s.tonic%12)+12)%12);
+const songTitle=s=>s.zh?`${s.name} · ${s.zh}`:s.name;
+function target(){
+  if(mode==='practice') return P.list[P.i]?P.list[P.i].m:null;
+  if(mode==='along'&&J){ const n=J.find(x=>!x.done); return n?n.m:null }
+  return null;
+}
 function buildTabs(){
   const t=$('tabs'); t.innerHTML='';
-  SONGS.forEach(s=>{const b=document.createElement('button');b.type='button';b.className='tab';b.setAttribute("role","tab");
-    b.setAttribute('aria-selected',s===song);b.innerHTML=`${s.name} · ${s.zh}`;
-    b.addEventListener('click',()=>{stopSong();song=s;buildTabs();buildSong();setMsg('Press Listen or Practice.')});t.appendChild(b)});
+  SONGS.forEach(s=>{const b=document.createElement('button');b.type='button';b.className='tab';b.setAttribute('role','tab');
+    b.setAttribute('aria-selected',s===song);
+    b.innerHTML=songTitle(s)+(BEST[s.id]!=null?` <span class="star">★${BEST[s.id]}%</span>`:'');
+    b.addEventListener('click',()=>{stopSong();song=s;loopSel=null;buildTabs();buildSong();setMsg('Press Listen, Practice or Play along.')});t.appendChild(b)});
+  if(!fm.hidden) fillFmSongs();
 }
 function buildSong(){
-  $('songmeta').innerHTML=`<b>${song.zh}</b><span>${song.name}</span><span>${song.key}</span><span>♩ = ${song.bpm}</span><span>${playable().length} notes</span>`;
+  const n=evAll().filter(x=>!x.rest).length, outOfRange=evAll().some(x=>!x.rest&&(x.m<LO||x.m>HI));
+  $('songmeta').innerHTML=`<b>${song.zh||song.name}</b>${song.zh?`<span>${song.name}</span>`:''}<span>${song.key}</span><span>${song.beats}/4</span><span>♩ = ${song.bpm}</span><span>${n} notes</span>`+
+    (BEST[song.id]!=null?`<span>Best ★${BEST[song.id]}%</span>`:'')+
+    (outOfRange?`<span class="warnc">Some notes are outside this recorder's range</span>`:'')+
+    (song.custom?`<button type="button" class="ghost" id="delSong">Delete song</button>`:'');
+  if(song.custom) $('delSong').onclick=()=>{ if($('delSong').dataset.sure){ CUSTOM=CUSTOM.filter(s=>s!==song); saveCustom(); SONGS=BUILTIN.concat(CUSTOM); song=SONGS[0]; buildTabs(); buildSong(); setMsg('Song deleted.') } else { $('delSong').dataset.sure='1'; $('delSong').textContent='Tap again to delete' } };
   const box=$('notes'); box.innerHTML=''; let k=0;
-  song.notes.forEach(n=>{
-    if(n.bar){ box.lastChild&&box.lastChild.classList.add('bar'); return }
-    const c=document.createElement('div'); c.className='chip'+(n.b>=2?' long':''); c.dataset.k=k++;
-    c.innerHTML=`<span class="d">${jianpu(n.m,song.tonic)}</span><span class="l">${label(n.m)}</span>`;
+  song.notes.forEach(x=>{
+    if(x.bar){ box.lastChild&&box.lastChild.classList.add('bar'); return }
+    const c=document.createElement('button'); c.type='button'; c.className='chip'+(x.b>=2?' long':'')+(x.rest?' rest':''); c.dataset.k=k++;
+    const nm=flatKeyOf(song)?label(x.m).replace(/^([A-G])♯/,(q,L)=>'DEFGAB C'['CDEFGA'.indexOf(L)]+'♭'):label(x.m);
+    c.innerHTML=x.rest?`<span class="d">0</span><span class="l">rest</span>`:`<span class="d">${jianpu(x.m,song.tonic)}</span><span class="l">${nm}</span>`;
+    c.addEventListener('click',()=>chipClick(+c.dataset.k));
     box.appendChild(c);
   });
-  markChips();
+  drawStaff(); applyView(); markChips();
+}
+function applyView(){
+  $('notes').hidden=view==='staff'; $('staffwrap').hidden=view==='jp';
+  document.querySelectorAll('#viewSeg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.view===view));
+  document.querySelectorAll('#inSeg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.in===inputSrc));
+}
+document.querySelectorAll('#viewSeg button').forEach(b=>b.addEventListener('click',()=>{view=b.dataset.view;saveView();applyView();markChips()}));
+document.querySelectorAll('#inSeg button').forEach(b=>b.addEventListener('click',()=>{
+  inputSrc=b.dataset.in; saveView(); applyView();
+  if(inputSrc==='real') setMsg('Play your own recorder near the phone. Practice and Play along will listen to it.'); else { setMsg('Play the on-screen recorder.'); if(typeof tunerStop==='function'&&tuner&&tuner.forSong) tunerStop() }
+}));
+
+/* staff notation: soprano music is written an octave below where it sounds (treble clef with 8 above) */
+const KEYSIG={0:[],7:['F'],2:['F','C'],9:['F','C','G'],4:['F','C','G','D'],5:['B'],10:['B','E'],3:['B','E','A']};
+const SIGSTEP={F:8,C:5,G:9,D:6,B:4,E:7,A:3};
+function spell(w,flatKey){
+  const pc=((w%12)+12)%12, oct=Math.floor(w/12)-1;
+  const SH=[[0,0],[0,1],[1,0],[1,1],[2,0],[3,0],[3,1],[4,0],[4,1],[5,0],[5,1],[6,0]];
+  const FL=[[0,0],[1,-1],[1,0],[2,-1],[2,0],[3,0],[4,-1],[4,0],[5,-1],[5,0],[6,-1],[6,0]];
+  let [L,acc]=(flatKey?FL:SH)[pc], o=oct;
+  return {L,acc,step:(o-4)*7+L-2};                            // step 0 = E4, the bottom line
+}
+function drawStaff(){
+  const sv=$('staff'), NSs='http://www.w3.org/2000/svg'; sv.innerHTML='';
+  const mk=(n,a,parent,txt)=>{const e=document.createElementNS(NSs,n);for(const k in a)e.setAttribute(k,a[k]);if(txt!=null)e.textContent=txt;(parent||sv).appendChild(e);return e};
+  const y0=34, Y=st=>y0+40-st*5, pc=((song.tonic%12)+12)%12, sig=KEYSIG[pc]||[], flatKey=sig[0]==='B';
+  const sigAcc={}; sig.forEach(l=>sigAcc['CDEFGAB'.indexOf(l)]=flatKey?-1:1);
+  const wOff=inst==='alto'?0:-12;
+  let x=8;
+  mk('text',{x,y:Y(2)+13,class:'clef'},null,'𝄞');
+  if(inst!=='alto') mk('text',{x:x+11,y:y0-7,class:'oct'},null,'8');
+  x+=34;
+  sig.forEach(l=>{ mk('text',{x,y:Y(SIGSTEP[l])+4,class:'acc'},null,flatKey?'♭':'♯'); x+=9 });
+  x+=6; mk('text',{x,y:Y(6)+5,class:'tsig'},null,String(song.beats)); mk('text',{x,y:Y(2)+5,class:'tsig'},null,'4'); x+=22;
+  let k=0;
+  song.notes.forEach(n=>{
+    if(n.bar){ mk('line',{x1:x,x2:x,y1:Y(8),y2:Y(0),class:'sl'}); x+=12; return }
+    const g=mk('g',{class:'sn','data-k':k++});
+    const dotted=[0.75,1.5,3,0.375].includes(n.b), base=dotted?n.b/1.5:n.b;
+    if(n.rest){
+      if(base>=2) mk('rect',{x,y:base>=4?Y(6):Y(4)-4,width:10,height:4,class:'hd'},g);
+      else mk('path',{d:`M${x+2} ${Y(6)} l5 6 l-4 4 l5 6 c-4 -2 -6 1 -3 5`,class:'rest'},g);
+      x+=14+n.b*16; return;
+    }
+    const sp=spell(n.m+wOff,flatKey), y=Y(sp.step);
+    const want=sigAcc[sp.L]||0;
+    if(sp.acc!==want){ mk('text',{x,y:y+4,class:'acc'},g,sp.acc===1?'♯':sp.acc===-1?'♭':'♮'); x+=9 }
+    for(let s=-2;s>=sp.step;s-=2) mk('line',{x1:x-4,x2:x+15,y1:Y(s),y2:Y(s),class:'sl'},g);
+    for(let s=10;s<=sp.step;s+=2) mk('line',{x1:x-4,x2:x+15,y1:Y(s),y2:Y(s),class:'sl'},g);
+    mk('ellipse',{cx:x+5.5,cy:y,rx:5.6,ry:4.1,transform:`rotate(-20 ${x+5.5} ${y})`,class:base>=2?'hd hollow':'hd'},g);
+    if(base<4){
+      const up=sp.step<4, sx=up?x+10.6:x+0.6, sy=up?y-30:y+30;
+      mk('line',{x1:sx,x2:sx,y1:y,y2:sy,class:'stem'},g);
+      const flags=base<=0.25?2:base<=0.5?1:0;
+      for(let f=0;f<flags;f++){ const fy=sy+(up?f*7:-f*7); mk('path',{d:up?`M${sx} ${fy} q8 6 6 16`:`M${sx} ${fy} q8 -6 6 -16`,class:'flag'},g) }
+    }
+    if(dotted) mk('circle',{cx:x+15,cy:y-(sp.step%2===0?3:0),r:1.7,class:'dot'},g);
+    x+=18+n.b*16;
+  });
+  for(let i=0;i<5;i++) sv.insertBefore(mk('line',{x1:4,x2:x,y1:y0+i*10,y2:y0+i*10,class:'sl'}),sv.firstChild);
+  sv.setAttribute('width',x+6); sv.setAttribute('height',y0+90); sv.setAttribute('viewBox',`0 0 ${x+6} ${y0+90}`);
+  sv.querySelectorAll('.sn').forEach(g=>g.addEventListener('click',()=>chipClick(+g.dataset.k)));
 }
 function markChips(active){
-  document.querySelectorAll('.chip').forEach(c=>{const k=+c.dataset.k;
-    c.classList.toggle('done',mode==='practice'&&k<idx);
-    c.classList.toggle('now',(mode==='practice'&&k===idx)||(mode==='demo'&&k===active));
+  const [a,b]=segRange(), pk=P.list[P.i]?P.list[P.i].k:-1;
+  document.querySelectorAll('.chip,.sn').forEach(c=>{const k=+c.dataset.k;
+    c.classList.toggle('done',mode==='practice'&&k>=a&&k<pk);
+    c.classList.toggle('now',(mode==='practice'&&k===pk)||((mode==='demo'||mode==='along')&&k===active));
+    c.classList.toggle('inloop',!!loopSel&&k>=a&&k<=b);
+    c.classList.toggle('pick',loopPick!=null&&k===loopPick);
+    ['perfect','good','early','late','miss','wrong'].forEach(r=>c.classList.toggle('j-'+r,!!(J&&J.byK[k]&&J.byK[k].res===r)));
   });
+  const now=document.querySelector('.sn.now');
+  if(now&&!$('staffwrap').hidden){ const w=$('staffwrap'), bx=now.getBBox?now.getBBox().x:0; if(bx<w.scrollLeft+40||bx>w.scrollLeft+w.clientWidth-80) w.scrollLeft=Math.max(0,bx-w.clientWidth/3) }
 }
-const setMsg=(t,good)=>{const m=$('msg');m.textContent=t;m.classList.toggle('good',!!good)};
-function onset(m){
-  if(mode!=='practice') return;
-  const list=playable();
-  if(list[idx]&&list[idx].m===m){
-    idx++;
-    if(idx>=list.length){ mode=null; setMsg(`Well played! ${song.zh} complete. 太棒了！`,true); if(!fm.hidden) fmText(`Well played! ${song.zh} complete. 太棒了！`) }
-    else setMsg(`Next: ${label(list[idx].m)}  (${idx}/${list.length})`);
-    markChips(); requestAnimationFrame(render);
-  }
+function chipClick(k){
+  if(loopPick===-1){ loopPick=k; setMsg('Now tap the last note of the section.'); markChips(); return }
+  if(loopPick!=null&&loopPick>=0){ loopSel=[Math.min(loopPick,k),Math.max(loopPick,k)]; loopPick=null; $('loopBtn').setAttribute('aria-pressed','true');
+    $('loopBtn').textContent='Loop on'; setMsg(`Looping notes ${loopSel[0]+1}–${loopSel[1]+1}. Listen repeats it; Practice and Play along use just this part.`); markChips(); return }
+  const n=evAll()[k]; if(n&&!n.rest&&!mode){ playMidi(n.m,'chip'); setTimeout(()=>release('chip'),350) }
 }
-function stopSong(){ clearTimeout(timer); timer=null; cancelAnimationFrame(demoRaf); if(mode==='demo'){ release('demo') } mode=null; markChips(); render() }
-$('stop').addEventListener('click',()=>{stopSong();setMsg('Stopped.')});
-$('practice').addEventListener('click',()=>{
-  stopSong(); ensure(); mode='practice'; idx=0;
-  setMsg(`Match the orange rings, then blow. Use a fresh breath for repeated notes. First: ${label(playable()[0].m)}`);
+$('loopBtn').addEventListener('click',()=>{
+  stopSong();
+  if(loopSel||loopPick!=null){ loopSel=null; loopPick=null; $('loopBtn').setAttribute('aria-pressed','false'); $('loopBtn').textContent='Loop'; setMsg('Loop off: the whole song plays.'); markChips(); return }
+  loopPick=-1; $('loopBtn').textContent='Cancel loop'; setMsg('Tap the first note of the section you want to repeat.'); markChips();
+});
+$('speed').addEventListener('input',()=>{ $('speedv').textContent=$('speed').value+'%' });
+const setMsg=(t,good)=>{const m=$('msg');m.textContent=t;m.classList.toggle('good',!!good); if(!fm.hidden) fmText(t)};
+function wrongFeedback(k){
+  buzz('wrong',[50,40,50]);
+  document.querySelectorAll(`.chip[data-k="${k}"],.sn[data-k="${k}"]`).forEach(c=>{c.classList.remove('nope');void c.getBoundingClientRect();c.classList.add('nope')});
+}
+function onset(m,kind){
+  if(mode==='practice'){
+    const want=P.list[P.i]; if(!want) return;
+    if(want.m===m){
+      P.i++;
+      if(P.i>=P.list.length){ mode=null; setMsg(`Well played! ${song.zh||song.name} complete. 太棒了！`,true); stopForcedMetro() }
+      else setMsg(`Next: ${label(P.list[P.i].m)}  (${P.i}/${P.list.length})`);
+      markChips(); requestAnimationFrame(render);
+    } else if(kind==='start'||kind==='real') wrongFeedback(want.k);
+  } else if(mode==='along') judgeOnset(m,kind);
+}
+let forcedMetro=false;
+function stopForcedMetro(){ if(forcedMetro){ forcedMetro=false; mStop() } }
+function stopSong(){
+  clearTimeout(timer); timer=null; cancelAnimationFrame(demoRaf);
+  if(mode==='demo') release('demo');
+  if(mode==='along'||mode==='practice') stopForcedMetro();
+  mode=null; TL=null; markChips(); render();
+}
+$('stop').addEventListener('click',()=>{ stopSong(); J=null; $('result').hidden=true; markChips(); setMsg('Stopped.') });
+async function useRealInput(){ if(inputSrc==='real'&&typeof tunerStart==='function') await tunerStart(true) }
+$('practice').addEventListener('click',async()=>{
+  stopSong(); ensure(); J=null; $('result').hidden=true;
+  P={list:playable(),i:0}; if(!P.list.length) return;
+  mode='practice'; await useRealInput();
+  setMsg(inputSrc==='real'?`Play each note on your recorder. First: ${label(P.list[0].m)}`:`Match the orange rings, then blow. Use a fresh breath for repeated notes. First: ${label(P.list[0].m)}`);
   markChips(); render();
 });
+
 // Listen: every note is scheduled on the audio clock up front, then the fingers follow
 // the audio clock minus the device's output delay, so what you see matches what you hear.
 let demoRaf=0, demoT0=null;
@@ -719,43 +1102,124 @@ function calibrate(btn,say){
 }
 $('calib').addEventListener('click',e=>calibrate(e.currentTarget,t=>setMsg(t)));
 $('calib2').addEventListener('click',e=>calibrate(e.currentTarget,t=>fmText(t)));
-function scheduleSong(list,t0){
-  const now=A.ctx.currentTime, beat=60/song.bpm, vib=$('vib').checked;
-  [A.g.gain,A.ng.gain,A.lfoG.gain,A.osc.frequency,A.lp.frequency,A.bp.frequency].forEach(p=>hold(p,now));
+// Song timeline on the audio clock. T0 = when beat 0 of the song plays; spb = seconds per beat.
+function metroFollow(T0,spb,from){
+  const beats=song.beats||4, ph=((beats-(song.pickup||0))%beats+beats)%beats;
+  setBpm(60/spb); setBeats(beats);
+  const xs=(from-T0)/spb, x0=Math.ceil(ph+xs-1e-6)-ph;
+  mStart(T0+x0*spb, Math.round(ph+x0)%beats, spb);
+}
+function scheduleSong(evs,t0,spb){
+  const now=A.ctx.currentTime, vib=$('vib').checked;
+  [A.g.gain,A.ng.gain,A.lfoG.gain,A.osc.frequency,A.lp.frequency,A.bp.frequency,A.osc.detune].forEach(p=>hold(p,now));
+  A.osc.detune.setValueAtTime(0,now);
   A.g.gain.setValueAtTime(0,t0);
-  const starts=[]; let t=t0;
-  list.forEach((n,k)=>{
-    const d=n.b*beat, f=freq(n.m), L=level(n.m); starts.push(t);
+  const starts=[]; let t=t0, prevRest=true;
+  evs.forEach(n=>{
+    const d=n.b*spb; starts.push(t);
+    if(n.rest){ A.g.gain.setValueAtTime(0,t); A.ng.gain.setValueAtTime(0,t); prevRest=true; t+=d; return }
+    const f=freq(n.m), L=level(n.m);
     A.osc.frequency.setValueAtTime(f*0.988,t); A.osc.frequency.setTargetAtTime(f,t,0.012);
-    A.lp.frequency.setValueAtTime(f*5,t); A.bp.frequency.setValueAtTime(f*2.2,t);
-    A.g.gain.setValueAtTime(k?L*0.05:0,t); A.g.gain.linearRampToValueAtTime(L,t+0.035);
+    A.lp.frequency.setValueAtTime(f*lpMul(n.m),t); A.bp.frequency.setValueAtTime(f*2.2,t);
+    A.g.gain.setValueAtTime(prevRest?0:L*0.05,t); A.g.gain.linearRampToValueAtTime(L,t+0.035);
     A.g.gain.setValueAtTime(L,t+d-0.03); A.g.gain.linearRampToValueAtTime(L*0.05,t+d-0.002);
     A.ng.gain.setValueAtTime(0.014,t); A.ng.gain.linearRampToValueAtTime(0.10,t+0.008); A.ng.gain.setTargetAtTime(0.014,t+0.01,0.035);
     A.lfoG.gain.setValueAtTime(0,t);
     if(vib&&d>0.45){ const e=Math.min(t+0.7,t+d-0.05); A.lfoG.gain.linearRampToValueAtTime(11*(e-t)/0.7,e) }
-    t+=d;
+    prevRest=false; t+=d;
   });
   A.g.gain.setValueAtTime(0,t); A.ng.gain.setValueAtTime(0,t); A.lfoG.gain.setValueAtTime(0,t);
   return {starts,end:t};
 }
 $('listen').addEventListener('click',()=>{
-  stopSong(); ensure(); if(!A.ctx) return;
-  mode='demo'; const list=playable();
-  setMsg(`Listening to ${song.zh}…`);
-  const t0=A.ctx.currentTime+0.12, {starts,end}=scheduleSong(list,t0); demoT0=t0;
-  if(M.on){ setBpm(song.bpm); setBeats(song.beats||4); mStart(t0) }
+  stopSong(); ensure(); if(!A.ctx) return; if(typeof tunerPause==='function') tunerPause(true);
+  mode='demo'; J=null; $('result').hidden=true;
+  const [a,b]=segRange(), evs=evAll().slice(a,b+1), spb=60/(song.bpm*speed());
+  setMsg(`Listening to ${song.zh||song.name}${loopSel?' (loop)':''}…`);
+  const t0=A.ctx.currentTime+0.15, {starts,end}=scheduleSong(evs,t0,spb);
+  TL={T0:t0-beatAt(a)*spb,spb};
+  if(M.on) metroFollow(TL.T0,spb,t0);
   A.on=true; sources.add('demo'); let shown=-1;
-  const lag=audioLag;
   const frame=()=>{
     if(mode!=='demo') return;
-    const heard=A.ctx.currentTime-lag();
-    if(heard>=end){ sources.delete('demo'); A.on=false; lastMidi=null; mode=null; markChips(); render();
-      setMsg('Your turn: press Practice.'); if(!fm.hidden) fmText('Your turn: press Practice.'); return }
+    const heard=A.ctx.currentTime-audioLag();
+    if(heard>=end){
+      sources.delete('demo'); A.on=false; lastMidi=null;
+      if(loopSel){ $('listen').click(); return }
+      mode=null; TL=null; markChips(); render(); if(typeof tunerPause==='function') tunerPause(false);
+      setMsg('Your turn: press Practice or Play along.'); return }
     let k=shown; while(k+1<starts.length&&starts[k+1]<=heard) k++;
-    if(k!==shown&&k>=0){ shown=k; setFingering(list[k].m); lastMidi=list[k].m; markChips(k); render(); pulse() }
+    if(k!==shown&&k>=0){ shown=k; const n=evs[k];
+      if(!n.rest){ setFingering(n.m); lastMidi=n.m; pulse() } markChips(a+k); render() }
     demoRaf=requestAnimationFrame(frame);
   };
   demoRaf=requestAnimationFrame(frame);
+});
+
+/* Play along: a bar of count-in clicks, then you play in time. Each note is scored on pitch and timing. */
+$('along').addEventListener('click',async()=>{
+  stopSong(); ensure(); if(!A.ctx) return;
+  const [a,b]=segRange(), evs=evAll().slice(a,b+1), spb=60/(song.bpm*speed()), beats=song.beats||4;
+  if(!evs.some(n=>!n.rest)) return;
+  await useRealInput();
+  const t0=A.ctx.currentTime+0.3+beats*spb;                // first note after one bar of count-in
+  TL={T0:t0-beatAt(a)*spb,spb};
+  const win=Math.min(0.32,Math.max(0.16,spb*0.45));
+  let t=t0; J=[]; J.byK={};
+  evs.forEach((n,i)=>{ if(!n.rest){ const j={k:a+i,m:n.m,t,done:false,res:null}; J.push(j); J.byK[j.k]=j } t+=n.b*spb });
+  J.end=t; J.win=win; J.spb=spb;
+  forcedMetro=!M.on; metroFollow(TL.T0,spb,t0-beats*spb);
+  mode='along'; $('result').hidden=true; markChips(); render();
+  const frame=()=>{
+    if(mode!=='along') return;
+    const heard=A.ctx.currentTime-audioLag();
+    if(heard<t0){ setMsg(`Get ready… ${Math.ceil((t0-heard)/spb)}`) }
+    J.forEach(j=>{ if(!j.done&&heard>j.t+win){ j.done=true; j.res='miss' } });
+    let act=-1; for(const j of J) if(j.t-0.05<=heard) act=j.k;
+    markChips(act); render();
+    if(heard>=t0&&heard<J.end) setMsg(inputSrc==='real'?'Play along on your recorder…':'Play along…');
+    if(heard>J.end+win){ finishAlong(); return }
+    demoRaf=requestAnimationFrame(frame);
+  };
+  demoRaf=requestAnimationFrame(frame);
+});
+function judgeOnset(m,kind){
+  if(!J||!A.ctx) return;
+  const heard=A.ctx.currentTime-audioLag()-(kind==='real'?0.05:0);   // the mic needs ~50 ms to recognise a note
+  let best=null; for(const j of J) if(!j.done&&Math.abs(heard-j.t)<J.win&&(!best||Math.abs(heard-j.t)<Math.abs(heard-best.t))) best=j;
+  if(!best) return;
+  if(best.m===m){ const e=heard-best.t, ae=Math.abs(e); best.done=true; best.err=e;
+    best.res=ae<0.06?'perfect':ae<0.13?'good':e<0?'early':'late'; markChips() }
+  else if(kind!=='glide'){ best.done=true; best.res='wrong'; wrongFeedback(best.k); markChips() }
+}
+function finishAlong(){
+  const pts={perfect:1,good:0.85,early:0.55,late:0.55}, n=J.length;
+  const hits=J.filter(j=>pts[j.res]!=null), score=Math.round(J.reduce((s,j)=>s+(pts[j.res]||0),0)/n*100);
+  const avg=hits.length?Math.round(hits.reduce((s,j)=>s+Math.abs(j.err),0)/hits.length*1000):0;
+  const cnt=r=>J.filter(j=>j.res===r).length, stars=score>=90?'★★★':score>=70?'★★☆':score>=40?'★☆☆':'☆☆☆';
+  const tip=cnt('early')>cnt('late')+2?'You tend to rush: wait for the click.':cnt('late')>cnt('early')+2?'You tend to drag: move your fingers a little before the beat.':cnt('wrong')>2?'Check the fingerings of the orange notes, then try at a slower speed.':cnt('miss')>2?'Some notes were missed: try Speed 70%, then speed up.':'Steady playing!';
+  const whole=!loopSel&&speed()>=1;
+  if(whole&&(BEST[song.id]==null||score>BEST[song.id])){ BEST[song.id]=score; try{localStorage.setItem('recorderBest',JSON.stringify(BEST))}catch(_){} buildTabs() }
+  const r=$('result'); r.hidden=false;
+  r.innerHTML=`<b class="stars">${stars}</b><span><b>${score}%</b> score</span><span>${hits.length}/${n} notes</span><span>±${avg} ms timing</span>`+
+    `<span class="jb j-perfect">${cnt('perfect')} perfect</span><span class="jb j-good">${cnt('good')} good</span><span class="jb j-early">${cnt('early')} early</span><span class="jb j-late">${cnt('late')} late</span><span class="jb j-wrong">${cnt('wrong')} wrong</span><span class="jb j-miss">${cnt('miss')} missed</span>`+
+    `<p>${tip}${whole?'':' Best scores are saved for the whole song at 100% speed.'}</p>`;
+  mode=null; stopForcedMetro(); markChips(); render(); setMsg(`${stars} ${score}% on ${song.zh||song.name}.`,score>=70);
+}
+
+/* Add your own song */
+$('songForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  const tonic=+$('sfKey').value, {notes,errs}=parseJianpu($('sfNotes').value,tonic);
+  const err=$('sfErr');
+  if(errs.length){ err.textContent=`These could not be read: ${errs.slice(0,5).join('  ')}. Use 1–7 or 0, with ' , # b - _ . as described above.`; return }
+  if(!notes.some(n=>!n.bar&&!n.rest)){ err.textContent='Type at least one note, such as 1 2 3.'; return }
+  const out=notes.filter(n=>!n.bar&&!n.rest&&(n.m<LO||n.m>HI));
+  const s={id:'c'+Date.now(),name:$('sfName').value.trim()||'My song',zh:'',key:$('sfKey').selectedOptions[0].textContent.split(' ')[0],tonic,
+    bpm:Math.max(40,Math.min(208,+$('sfBpm').value||96)),beats:+$('sfBeats').value,pickup:Math.max(0,+$('sfPick').value||0),src:$('sfNotes').value.trim()};
+  s.notes=notes; s.custom=true; CUSTOM.push(s); saveCustom(); SONGS=BUILTIN.concat(CUSTOM);
+  stopSong(); song=s; loopSel=null; buildTabs(); buildSong();
+  err.textContent=out.length?`Saved. ${out.length} note(s) are outside this recorder's range; try another key.`:'Saved. It is now in the song list.';
 });
 
 /* ---------- finger mode: multi-touch, like holding a real recorder ---------- */
@@ -798,6 +1262,21 @@ function layoutFM(){
     pos['6:2']=[cx+P*0.92,y(6),P*0.3]; pos['7:2']=[cx+P*0.92,y(7),P*0.3];
     Object.assign(hint.style,{left:'0px',maxWidth:Math.max(90,cx-P*1.1-8)+'px'});
   }
+  // Fit to hand: use the spots where this player's fingers rest, if they have set them for this orientation.
+  const hand=HAND[horiz?'landscape':'portrait'];
+  tube.hidden=!!hand; $('fmFitReset').hidden=!hand;
+  if(hand){
+    const P8=hand.map(([nx,ny])=>[nx*w,ny*h]);
+    let md=1e9; for(let a=0;a<8;a++) for(let b=a+1;b<8;b++) md=Math.min(md,Math.hypot(P8[a][0]-P8[b][0],P8[a][1]-P8[b][1]));
+    const r=Math.max(24,Math.min(70,md*0.46));
+    P8.forEach((q,i)=>{ pos[i+':1']=[q[0],q[1],r] });
+    const d=[P8[7][0]-P8[1][0],P8[7][1]-P8[1][1]], dl=Math.hypot(d[0],d[1])||1, nrm=[-d[1]/dl,d[0]/dl];
+    const side=((P8[0][0]-P8[1][0])*nrm[0]+(P8[0][1]-P8[1][1])*nrm[1])>0?-1:1;   // tabs go on the side away from the thumb
+    const clampP=(x,y)=>[Math.max(r*0.6,Math.min(w-r*0.6,x)),Math.max(r*0.6,Math.min(h-r*0.6,y))];
+    [6,7].forEach(i=>{ const q=clampP(P8[i][0]+nrm[0]*side*r*1.6,P8[i][1]+nrm[1]*side*r*1.6); pos[i+':2']=[q[0],q[1],r*0.6] });
+    const tv=[P8[0][0]-P8[1][0],P8[0][1]-P8[1][1]], tl=Math.hypot(tv[0],tv[1])||1;
+    const q=clampP(P8[0][0]+tv[0]/tl*r*1.6,P8[0][1]+tv[1]/tl*r*1.6); pos['0:2']=[q[0],q[1],r*0.6];
+  }
   // Flip mirrors only the instrument: mouthpiece to the bottom (portrait, the microphone end) or the right (landscape).
   tube.classList.toggle('flipv',flipped&&!horiz); tube.classList.toggle('fliph',flipped&&horiz);
   if(flipped) for(const k in pos){ const q=pos[k]; if(horiz) q[0]=w-q[0]; else q[1]=h-q[1] }
@@ -811,29 +1290,36 @@ function layoutFM(){
 function hitZone(cX,cY){
   const b=field.getBoundingClientRect(), x=cX-b.left, y=cY-b.top; let best=null, bd=1e9;
   for(const z of zones){ const d=Math.hypot(x-z.x,y-z.y)/z.r; const lim=z.tab?1.25:1.3; if(d<lim&&d<bd){bd=d;best=z} }
-  return best?{i:best.i,v:best.v}:{air:true};
+  return best?{i:best.i,v:best.v,leak:!best.tab&&bd>0.72&&OPT.leak}:{air:true};
 }
+let leaky=new Set();
 function applyTouches(){
-  const h=[0,0,0,0,0,0,0,0];
-  for(const t of touches.values()) if(!t.air){ if(t.v===1) h[t.i]=1; else if(h[t.i]!==1) h[t.i]=2 }
-  holes=h; changed();
+  const h=[0,0,0,0,0,0,0,0], clean=new Set(), lk=new Set();
+  for(const t of touches.values()) if(!t.air){ if(t.v===1) h[t.i]=1; else if(h[t.i]!==1) h[t.i]=2; (t.leak?lk:clean).add(t.i) }
+  leaky=new Set([...lk].filter(i=>!clean.has(i))); BR.leak=Math.min(2,leaky.size);
+  holes=h; changed(); applyBreath();
 }
 function breath(want,tongue){
   clearTimeout(offTimer);
   if(want){
     if(!sources.has('fm')) startBlow('fm');
-    else if(tongue){ const m=cur().midi; soundTongue(m); lastMidi=m; onset(m); render() }
+    else if(tongue){ const m=cur().midi; soundTongue(m); lastMidi=m; onset(m,'start'); render() }
   } else if(sources.has('fm')) offTimer=setTimeout(()=>release('fm'), fmMode==='touch'?70:0);
 }
 field.addEventListener('pointerdown',e=>{
   e.preventDefault(); ensure(); try{field.setPointerCapture(e.pointerId)}catch(_){}
+  if(fit){ fitTap(e); return }
   const z=hitZone(e.clientX,e.clientY); touches.set(e.pointerId,z); applyTouches();
+  if(!z.air) buzz('hole',z.leak?[8,40,8]:12);
   if(fmMode==='touch') breath(true, z.air && sources.has('fm'));
 });
 field.addEventListener('pointermove',e=>{
   const t=touches.get(e.pointerId); if(!t) return;
   const z=hitZone(e.clientX,e.clientY);
-  if(z.air!==t.air||z.i!==t.i||z.v!==t.v){ touches.set(e.pointerId,z); applyTouches() }
+  if(z.air!==t.air||z.i!==t.i||z.v!==t.v||z.leak!==t.leak){
+    touches.set(e.pointerId,z); applyTouches();
+    if(!z.air&&(z.air!==t.air||z.i!==t.i||z.v!==t.v)) buzz('hole',z.leak?[8,40,8]:12); else if(z.leak&&!t.leak) buzz('hole',[8,40,8]);
+  }
 });
 const lift=e=>{ if(!touches.delete(e.pointerId)) return; applyTouches(); if(fmMode==='touch') breath(touches.size>0) };
 ['pointerup','pointercancel'].forEach(ev=>field.addEventListener(ev,lift));
@@ -849,6 +1335,7 @@ function renderFM(n,tgt){
   fmPads.forEach(d=>{const i=+d.dataset.i, v=+d.dataset.v, tab=d.classList.contains('tab');
     d.classList.toggle('covered', tab?holes[i]===2:holes[i]===1);
     d.classList.toggle('halfc', !tab&&holes[i]===2);
+    d.classList.toggle('leak', !tab&&leaky.has(i));
     d.classList.remove('want','ok','lift');
     if(f&&!tab){ if(f[i]){d.classList.add('want'); if(f[i]===holes[i]) d.classList.add('ok')} else if(holes[i]) d.classList.add('lift') }
     if(f&&tab&&f[i]===2){d.classList.add('want'); if(holes[i]===2) d.classList.add('ok')}
@@ -856,7 +1343,7 @@ function renderFM(n,tgt){
 }
 function fmText(t){ $('fmMsg').textContent=t }
 async function setFmMode(m){
-  fmMode=m; document.querySelectorAll('.seg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.mode===m));
+  fmMode=m; document.querySelectorAll('#fm .seg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.mode===m));
   breath(false); micStop();
   $('fmMic').hidden=m!=='mic'; $('fmHint').hidden=m!=='touch';
   if(m==='touch'){ fmText(field.clientWidth>field.clientHeight*1.15?'Lay the phone flat and play with your fingers in a row. Sound plays while any finger is down.':'Hold the phone upright like a recorder: left hand on 1–3, right hand on 4–7. Sound plays while any finger is down. Turn sideways to play flat on a table.'); return }
@@ -864,11 +1351,12 @@ async function setFmMode(m){
   try{ await micStart(); fmText(flipped?'Blow gently at the mouthpiece, by the microphone. Say "tu" to tongue notes.':'Blow across the mic at the bottom of the phone. Tip: press Flip to put the mouthpiece there.') }
   catch(err){ fmText('The microphone is not available here, so Touch mode is back on. Open the GitHub Pages version over https and allow the mic.'); setTimeout(()=>{ if(fmMode==='mic') setFmMode('touch') },2600) }
 }
-document.querySelectorAll('.seg button').forEach(b=>b.addEventListener('click',()=>{ensure();setFmMode(b.dataset.mode)}));
+document.querySelectorAll('#fm .seg button').forEach(b=>b.addEventListener('click',()=>{ensure();setFmMode(b.dataset.mode)}));
 const thr=()=>0.003*Math.pow(2,(100-+$('sens').value)/14);
 async function micStart(){
-  ensure();
+  ensure(); if(tuner) tunerStop();
   if(!A.ctx||!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia) throw new Error('no mic');
+  setSession('play-and-record');
   const stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
   if(fmMode!=='mic'||fm.hidden){ stream.getTracks().forEach(t=>t.stop()); return }
   const src=A.ctx.createMediaStreamSource(stream);
@@ -878,25 +1366,34 @@ async function micStart(){
   const meter=$('meter'), bar=meter.firstElementChild;
   const loop=()=>{ if(!mic) return;
     mic.an.getFloatTimeDomainData(mic.buf); let s=0; for(const v of mic.buf) s+=v*v; const rms=Math.sqrt(s/mic.buf.length);
-    mic.lvl = rms>mic.lvl ? rms : mic.lvl*0.8+rms*0.2;
-    const T=thr(); bar.style.width=Math.min(100,mic.lvl/(T*2.5)*100)+'%';
+    const gated=A.gateUntil&&A.ctx.currentTime<A.gateUntil;   // ignore the phone's own buzz
+    const x=gated?Math.min(rms,mic.lvl):rms;
+    mic.lvl = x>mic.lvl ? x : mic.lvl*0.8+x*0.2;
+    const T=thr();
     if(!mic.on&&mic.lvl>T){ mic.on=true; breath(true) }
     else if(mic.on&&mic.lvl<T*0.6){ mic.on=false; breath(false) }
+    // Breath relative to what this note needs: low notes want less air than high ones.
+    const nm=A.base!=null?A.base:cur().midi, r=mic.lvl/(T*2.2)/(0.75+(nm-LO)*0.022);
+    if(mic.on){ BR.r=r; applyBreath() }
+    bar.style.width=Math.min(100,r/2*100)+'%';
+    const bt=$('breathTxt'); bt.textContent=!mic.on?'–':r<0.75?'more air':r>1.35?(BR.squeak?'squeak!':'less air'):'good';
+    bt.classList.toggle('bad',mic.on&&(r<0.75||r>1.35));
     meter.classList.toggle('on',mic.on);
     mic.raf=requestAnimationFrame(loop) };
   loop();
 }
-function micStop(){ if(!mic) return; cancelAnimationFrame(mic.raf); mic.stream.getTracks().forEach(t=>t.stop()); mic=null }
+function micStop(){ BR.r=1; if(!mic) return; cancelAnimationFrame(mic.raf); mic.stream.getTracks().forEach(t=>t.stop()); mic=null; setSession('playback') }
 
 function openFM(){
   ensure(); stopSong(); releaseAll(); touches.clear(); holes=[0,0,0,0,0,0,0,0];
   fm.hidden=false; document.body.style.overflow='hidden';
-  const sel=$('fmSong'); sel.innerHTML=SONGS.map(s=>`<option value="${s.id}"${s===song?' selected':''}>${s.zh} ${s.name}</option>`).join('');
+  fillFmSongs();
   buildFM(); setFmMode('touch'); render();
   try{ fm.requestFullscreen&&fm.requestFullscreen().catch(()=>{}) }catch(_){}
   try{ navigator.wakeLock&&navigator.wakeLock.request('screen').then(l=>wake=l).catch(()=>{}) }catch(_){}
 }
 function closeFM(){
+  if(fit) endFit();
   micStop(); touches.clear(); clearTimeout(offTimer); stopSong(); releaseAll(); if(flipped) setFlip(false);
   fm.hidden=true; document.body.style.overflow='';
   try{ document.fullscreenElement&&document.exitFullscreen().catch(()=>{}) }catch(_){}
@@ -905,13 +1402,41 @@ function closeFM(){
 }
 $('fmOpen').addEventListener('click',openFM);
 $('fmExit').addEventListener('click',closeFM);
+
+/* ---------- fit to hand ---------- */
+let HAND={}, fit=null;
+try{ HAND=JSON.parse(localStorage.getItem('recorderHand')||'{}')||{} }catch(_){}
+const saveHand=()=>{ try{localStorage.setItem('recorderHand',JSON.stringify(HAND))}catch(_){} };
+const FINGERS=['left thumb (T)','left index finger (hole 1)','left middle finger (hole 2)','left ring finger (hole 3)','right index finger (hole 4)','right middle finger (hole 5)','right ring finger (hole 6)','right little finger (hole 7)'];
+const fitPrompt=()=>`Touch where your ${FINGERS[fit.pts.length]} rests. (${fit.pts.length+1} of 8)`;
+function fitTap(e){
+  const b=field.getBoundingClientRect(); let nx=(e.clientX-b.left)/b.width, ny=(e.clientY-b.top)/b.height;
+  const dot=document.createElement('div'); dot.className='fitdot'; dot.style.left=(nx*b.width)+'px'; dot.style.top=(ny*b.height)+'px';
+  dot.textContent=fit.pts.length?String(fit.pts.length):'T'; field.appendChild(dot); buzz('hole',12);
+  const horiz=b.width>b.height*1.15;
+  if(flipped){ if(horiz) nx=1-nx; else ny=1-ny }   // store the unflipped layout
+  fit.pts.push([nx,ny]);
+  if(fit.pts.length<8){ fmText(fitPrompt()); return }
+  HAND[horiz?'landscape':'portrait']=fit.pts; saveHand(); endFit();
+  fmText('Holes now sit where your fingers rest. Press Standard layout to go back.');
+}
+function endFit(){ fit=null; field.classList.remove('fitting'); field.querySelectorAll('.fitdot').forEach(d=>d.remove()); layoutFM(); render() }
+$('fmFit').addEventListener('click',()=>{
+  if(fit){ endFit(); fmText('Fitting cancelled.'); return }
+  touches.clear(); breath(false); applyTouches(); fit={pts:[]}; field.classList.add('fitting');
+  fmText('Hold the phone the way you will play. '+fitPrompt()+' Press Fit to hand again to cancel.');
+});
+$('fmFitReset').addEventListener('click',()=>{ delete HAND[field.clientWidth>field.clientHeight*1.15?'landscape':'portrait']; saveHand(); layoutFM(); fmText('Standard layout restored.') });
+$('fitResetAll').addEventListener('click',()=>{ HAND={}; saveHand(); if(!fm.hidden) layoutFM(); $('fitResetAll').textContent='Hand layouts reset' });
 function setFlip(on){ flipped=on;  $('fmFlip').setAttribute('aria-pressed',on); layoutFM();
   const hz=field.clientWidth>field.clientHeight*1.15; fmText(on?(hz?'Mouthpiece is now on the right.':'Mouthpiece is now at the bottom, by the phone\'s microphone. Blow there in Mic mode.'):(hz?'Mouthpiece is on the left.':'Mouthpiece is at the top.')) }
 $('fmFlip').addEventListener('click',()=>setFlip(!flipped));
 window.addEventListener('resize',()=>{ if(!fm.hidden) layoutFM() });
-$('fmSong').addEventListener('change',e=>{ stopSong(); song=SONGS.find(s=>s.id===e.target.value); buildTabs(); buildSong(); render() });
-$('fmListen').addEventListener('click',()=>{ touches.clear(); breath(false); $('listen').click(); fmText(`Listening to ${song.zh}…`) });
-$('fmPractice').addEventListener('click',()=>{ $('practice').click(); fmText('Cover the holes with orange rings, then play.') });
+function fillFmSongs(){ $('fmSong').innerHTML=SONGS.map(s=>`<option value="${s.id}"${s===song?' selected':''}>${s.zh?s.zh+' ':''}${s.name}</option>`).join('') }
+$('fmSong').addEventListener('change',e=>{ stopSong(); song=SONGS.find(s=>s.id===e.target.value); loopSel=null; buildTabs(); buildSong(); render() });
+$('fmListen').addEventListener('click',()=>{ touches.clear(); breath(false); $('listen').click() });
+$('fmPractice').addEventListener('click',()=>{ $('practice').click() });
+$('fmAlong').addEventListener('click',()=>{ touches.clear(); breath(false); $('along').click() });
 
 /* ---------- metronome ---------- */
 // Clicks are scheduled on the audio clock a little ahead (steady even if the page is busy);
@@ -930,29 +1455,29 @@ function mUI(){
   $('mTerm').textContent=TERMS.find(t=>M.bpm<t[0])[1]; $('mBeats').value=String(M.beats);
   $('mToggle').textContent=M.on?'Stop':'Start'; $('mToggle').setAttribute('aria-pressed',M.on); $('fmMetro').setAttribute('aria-pressed',M.on);
 }
-function setBpm(v){ M.bpm=Math.max(40,Math.min(208,Math.round(v))); saveMetro(); mUI() }
+function setBpm(v){ M.bpm=Math.max(40,Math.min(208,Math.round(v))); M.spbOv=0; saveMetro(); mUI() }
 function setBeats(v){ M.beats=+v; M.beat%=M.beats; saveMetro(); buildDots(); mUI() }
 function click(t,accent){
   const o=A.ctx.createOscillator(), g=A.ctx.createGain(); o.type='triangle'; o.frequency.value=accent?1760:1175;
   g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(accent?0.55:0.35,t+0.002); g.gain.exponentialRampToValueAtTime(0.001,t+0.05);
-  o.connect(g); g.connect(A.master); o.start(t); o.stop(t+0.07); return o;
+  o.connect(g); g.connect(A.master); o.start(t); o.stop(t+0.07); (A.clicks=A.clicks||[]).push(t); if(A.clicks.length>12) A.clicks.shift(); return o;
 }
 function mSchedule(){
   if(!M.on) return;
   while(M.next<A.ctx.currentTime+0.12){
     const o=click(M.next, M.beat===0&&M.beats>1); M.queue.push({t:M.next,b:M.beat,o});
-    M.beat=(M.beat+1)%M.beats; M.next+=60/M.bpm;
+    M.beat=(M.beat+1)%M.beats; M.next+=M.spbOv||60/M.bpm;
   }
 }
 function mDraw(){
   if(!M.on) return; const heard=A.ctx.currentTime-audioLag(); let cur=null;
   while(M.queue.length&&M.queue[0].t<=heard) cur=M.queue.shift();
-  if(cur) lightDot(cur.b);
+  if(cur){ lightDot(cur.b); buzz('metro',cur.b===0&&M.beats>1?40:18) }
   M.raf=requestAnimationFrame(mDraw);
 }
-function mStart(at,beat){
+function mStart(at,beat,spb){
   ensure(); if(!A.ctx) return; mStop(true);
-  M.on=true; M.beat=beat||0; M.next=at!=null?at:A.ctx.currentTime+0.08;
+  M.on=true; M.beat=beat||0; M.spbOv=spb||0; M.next=at!=null?at:A.ctx.currentTime+0.08;
   mSchedule(); M.timer=setInterval(mSchedule,25); M.raf=requestAnimationFrame(mDraw); mUI();
 }
 function mStop(quiet){
@@ -963,11 +1488,7 @@ function mStop(quiet){
 function mToggle(){
   if(M.on) return mStop();
   // Switched on while a song is playing: match its tempo and come in on its next beat.
-  if(mode==='demo'&&demoT0!=null&&A.ctx){
-    setBpm(song.bpm); setBeats(song.beats||4);
-    const beat=60/song.bpm, n=Math.ceil((A.ctx.currentTime+0.05-demoT0)/beat);
-    return mStart(demoT0+n*beat, n%M.beats);
-  }
+  if(TL&&(mode==='demo'||mode==='along')&&A.ctx) return metroFollow(TL.T0,TL.spb,A.ctx.currentTime+0.05);
   mStart();
 }
 let taps=[];
@@ -984,6 +1505,89 @@ $('mTap').addEventListener('click',()=>{
   if(taps.length>=2){ const gaps=taps.slice(1).map((t,i)=>t-taps[i]); setBpm(60000/(gaps.reduce((a,b)=>a+b)/gaps.length)) }
 });
 buildDots(); mUI();
+
+/* ---------- real recorder: hear your own recorder through the mic ---------- */
+// Pitch detection uses the YIN method (difference function + cumulative normalisation) on 1024-sample
+// windows, which recognises a recorder note in about 50 ms and works fully offline.
+let tuner=null;
+const TN=['C','C♯','D','E♭','E','F','F♯','G','G♯','A','B♭','B'];
+function yin(buf,sr){
+  const N=1024; let e=0; for(let i=0;i<N;i++) e+=buf[i]*buf[i];
+  const rms=Math.sqrt(e/N); if(rms<0.006) return {rms};
+  const tmin=Math.max(2,Math.floor(sr/2700)), tmax=Math.min(buf.length-N-1,Math.ceil(sr/300));
+  const c=new Float32Array(tmax+2); let run=0; c[0]=1;
+  for(let t=1;t<=tmax+1;t++){ let s=0; for(let i=0;i<N;i++){ const x=buf[i]-buf[i+t]; s+=x*x } run+=s; c[t]=run?s*t/run:1 }
+  let tau=-1;
+  for(let t=tmin;t<=tmax;t++) if(c[t]<0.15){ while(t+1<=tmax&&c[t+1]<c[t]) t++; tau=t; break }
+  if(tau<0) return {rms};
+  const a=c[tau-1], b=c[tau], g=c[tau+1], den=a+g-2*b, sh=den?0.5*(a-g)/den:0;
+  return {rms, f:sr/(tau+sh), clarity:1-b};
+}
+async function tunerStart(forSong){
+  ensure(); if(!A.ctx) return false;
+  if(tuner){ tuner.forSong=tuner.forSong||!!forSong; return true }
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){ $('tStatus').textContent='This browser cannot use the microphone. Open the installed app or the GitHub Pages site.'; return false }
+  if(typeof setFmMode==='function'&&fmMode==='mic') setFmMode('touch');
+  let stream;
+  try{ setSession('play-and-record'); stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}}) }
+  catch(_){ setSession('playback'); $('tStatus').textContent='The microphone is not available. Allow it in the browser settings (in the Claude preview it is always blocked; use the GitHub Pages site).'; setMsg('Microphone not available, so practice uses the on-screen recorder.'); return false }
+  const src=A.ctx.createMediaStreamSource(stream), hp=A.ctx.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=250;
+  const an=A.ctx.createAnalyser(); an.fftSize=2048; src.connect(hp); hp.connect(an);
+  tuner={stream,an,buf:new Float32Array(2048),raf:0,forSong:!!forSong,paused:false,cand:null,candN:0,note:null,quiet:0,
+    noteRms:0,dipped:false,startAt:0,attack:null,cents:[],count:0};
+  $('tunerBtn').textContent='Stop listening'; $('tunerBtn').setAttribute('aria-pressed','true');
+  $('tStatus').textContent='Listening. Play a long note on your recorder.';
+  const loop=()=>{ if(!tuner) return; tunerFrame(); tuner.raf=requestAnimationFrame(loop) };
+  loop(); return true;
+}
+function tunerStop(){
+  if(!tuner) return; cancelAnimationFrame(tuner.raf); tuner.stream.getTracks().forEach(t=>t.stop()); tuner=null; setSession('playback');
+  $('tunerBtn').textContent='Start listening'; $('tunerBtn').setAttribute('aria-pressed','false');
+  $('tStatus').textContent='Uses the microphone. Nothing is recorded or sent anywhere.'; $('tNote').textContent='–'; $('tJp').innerHTML='';
+  $('tNeedle').style.left='50%'; $('tCents').textContent='–'; $('tHz').textContent='–';
+}
+function tunerPause(on){ if(tuner){ tuner.paused=on; if(on) tuner.note=null } }
+function tunerFrame(){
+  const T=tuner, now=A.ctx.currentTime;
+  if(T.paused||blowing()) return;                                    // don't listen to the app's own recorder sound
+  if((A.clicks||[]).some(t=>now>t-0.01&&now<t+0.09)) return;         // or to metronome clicks
+  T.an.getFloatTimeDomainData(T.buf);
+  const r=yin(T.buf,A.ctx.sampleRate);
+  const ok=r.f&&r.clarity>0.82&&r.rms>0.01;
+  if(!ok){ if(++T.quiet>=4&&T.note!=null){ T.note=null; $('tStatus').textContent='Listening…' } return }
+  T.quiet=0;
+  const mf=69+12*Math.log2(r.f/440), n=Math.round(mf), cents=(mf-n)*100;
+  if(n<LO-3||n>HI+3) return;
+  if(n===T.cand) T.candN++; else { T.cand=n; T.candN=1 }
+  if(T.note===n){
+    T.noteRms=Math.max(T.noteRms*0.99,r.rms);
+    if(r.rms<T.noteRms*0.4) T.dipped=true;
+    else if(T.dipped&&r.rms>T.noteRms*0.75){ T.dipped=false; noteStart(n,now,r.rms); }   // tongued repeat ("tu")
+  }
+  if(T.candN>=3&&T.note!==n) noteStart(n,now,r.rms);
+  if(T.note!==n) return;
+  T.cents.push(cents); if(T.cents.length>30) T.cents.shift();
+  if(T.attack==null){ const dt=now-T.startAt; if(Math.abs(cents)<20){ T.attack=dt<0.08?'Clean':'Scooped' } else if(dt>0.3) T.attack='Unsteady' ; if(T.attack) $('tAttack').textContent=T.attack }
+  const avg=T.cents.slice(-12).reduce((a,b)=>a+b,0)/Math.min(12,T.cents.length);
+  const mean=T.cents.reduce((a,b)=>a+b,0)/T.cents.length, sd=Math.sqrt(T.cents.reduce((a,b)=>a+(b-mean)**2,0)/T.cents.length);
+  const needle=$('tNeedle'); needle.style.left=(50+Math.max(-50,Math.min(50,avg)))+'%'; needle.classList.toggle('off',Math.abs(avg)>=10);
+  $('tCents').textContent=(avg>0?'+':'')+Math.round(avg); $('tHz').textContent=r.f.toFixed(1);
+  if(T.cents.length>=8){
+    $('tTune').textContent=Math.abs(avg)<10?'In tune':avg>0?'Sharp':'Flat';
+    $('tSteady').textContent=sd<4?'Very steady':sd<9?'Steady':'Wobbly'; $('tSteadyBar').style.width=Math.max(4,100-sd*5)+'%';
+    $('tMsg').textContent=Math.abs(avg)>=10?(avg>0?'A little sharp: blow more gently.':'A little flat: blow slightly more, with a steady stream.'):sd>=9?'The pitch wobbles: keep the breath even, like a slow "doo".':T.attack==='Scooped'?'Start notes with a light "tu" so they begin on pitch.':'Good tone. Keep going!';
+  }
+}
+function noteStart(n,now,rms){
+  const T=tuner; T.note=n; T.startAt=now; T.attack=null; T.cents=[]; T.noteRms=rms; T.dipped=false; T.count++;
+  $('tNote').textContent=TN[n%12]+(Math.floor(n/12)-1); $('tJp').innerHTML=jianpu(n); $('tCount').textContent=T.count; $('tAttack').textContent='…';
+  $('tStatus').textContent='Hearing your recorder';
+  if(table()[n]&&mode!=='demo'){ holes=[...table()[n]].map(dec); render() }   // show its fingering on the recorder above
+  const want=mode==='practice'&&P.list[P.i]?P.list[P.i].m:null;
+  if(want!=null&&n===want+12) $('tMsg').textContent='Squeak! That note jumped up an octave: blow more gently and check every hole is sealed.';
+  onset(n,'real');
+}
+$('tunerBtn').addEventListener('click',()=>{ tuner?tunerStop():tunerStart(false) });
 
 drawRecorder(); buildChart(); buildTabs(); buildSong(); render();
 })();

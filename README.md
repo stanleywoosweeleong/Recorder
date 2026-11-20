@@ -19,6 +19,24 @@ It is an installable app (PWA) that works offline. Open the link once while onli
 ## If Listen's fingers don't match the sound
 Phones and Bluetooth speakers play sound a little late, and iPhone Safari doesn't report how late. Press **Tap to sync** (next to Volume, or in Finger mode), then tap the button on each of the 10 clicks. The app measures your delay and sets **Finger sync** for you. You can still fine-tune the slider: right if the fingers move too early, left if too late.
 
+## Practise with your real recorder 真竖笛
+In **Real recorder**, press **Start listening** and play your own recorder near the phone. It shows the note, a tuning needle in cents (sharp: blow more gently; flat: a little more air), how steady the note is, and whether it started cleanly. It also shows that note's fingering on the recorder. In the songbook choose **My real recorder**, then Practice or Play along listens to your instrument. Works offline; nothing is recorded or sent anywhere.
+
+## Songbook 练习曲
+12 songs, in 简谱, staff notation (五线谱) or both:
+- **Listen**: hear the song while the fingers move.
+- **Practice**: play note by note, at your own pace.
+- **Play along**: a bar of count-in, then play in time with the metronome. You get a score for each note (perfect, good, early, late, wrong, missed) and a star rating. Best scores are saved per song.
+- **Speed**: 40%–120%. **Loop**: tap the first and last note of a hard section to repeat just that part.
+- **Add your own song** in 简谱 (1–7, 0 rest, ' and , for octaves, # and b, - _ . for lengths, | for bars).
+
+## Breath, touch and vibration
+- In Finger mode's **Mic** mode, breath strength matters: more air goes sharp and louder, and too much on a low note squeaks up an octave; too little goes flat and airy. The breath gauge shows the right amount for each note.
+- **Leaks**: a finger off the centre of a hole leaks like a real one (sharp, hissy, orange glow).
+- **Fit to hand**: touch where each finger rests and the holes move to fit your hand.
+- **Vibration** (Android): a tick when a finger lands on a hole, a metronome pulse, and a buzz on wrong notes. On iPhone only the hole tick works (iOS 18+).
+- **Alto recorder (F)** as well as soprano (C), Baroque or German fingering, with fingerings checked against Wikipedia's fingering table and recorderhomepage.net.
+
 ## Metronome 节拍器
 Press **Start** in the Metronome panel (or **M** on a keyboard, or **♩** in Finger mode). Set the speed with − / +, the slider, or **Tap tempo**; pick 2/4, 3/4 or 4/4 for the accented first beat; **Use song tempo** matches the selected song. While a song plays (Listen) you can turn the metronome on or off at any time; it switches to the song's tempo and comes in on the song's next beat.
 
