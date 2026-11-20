@@ -161,7 +161,7 @@ section{display:flex;flex-direction:column;gap:14px}
 .meter i{display:block;height:100%;width:0;background:var(--accent)}
 .meter.on i{background:var(--guide)}
 .fm-field{position:relative;flex:1;min-height:0;touch-action:none}
-.fm-tube{position:absolute;top:0;bottom:0;border-radius:44px 44px 14px 14px;background:linear-gradient(90deg,var(--wood-lo),var(--wood-hi) 35%,var(--wood-mid) 62%,var(--wood-lo));pointer-events:none}
+.fm-tube{position:absolute;border-radius:44px 44px 14px 14px;background:linear-gradient(90deg,var(--wood-lo),var(--wood-hi) 35%,var(--wood-mid) 62%,var(--wood-lo));pointer-events:none}
 .fm-hint{position:absolute;left:0;bottom:6px;font-size:12px;color:var(--muted);max-width:34%;pointer-events:none;line-height:1.35}
 .fp{position:absolute;border-radius:50%;transform:translate(-50%,-50%);display:grid;place-items:center;pointer-events:none;
   background:radial-gradient(circle,var(--hole) 0 27%,transparent 28%),color-mix(in srgb,var(--wood-hi) 55%,transparent);border:2px solid var(--band);transition:background-color .05s}
@@ -182,6 +182,15 @@ section{display:flex;flex-direction:column;gap:14px}
 #win.flash{animation:winflash .2s ease-out}
 .fm-note b.flash{animation:none;color:var(--accent)}
 #syncv{font-variant-numeric:tabular-nums;min-width:4.5em;display:inline-block}
+.fm-tube.horiz{border-radius:44px 14px 14px 44px;background:linear-gradient(180deg,var(--wood-lo),var(--wood-hi) 35%,var(--wood-mid) 62%,var(--wood-lo))}
+.fm-x[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.fm-in{display:flex;flex-direction:column;height:100%;min-height:0}
+.fm.flip .fm-in{transform:rotate(180deg)}
+.fm.flip{padding-top:env(safe-area-inset-bottom,0px);padding-bottom:env(safe-area-inset-top,0px)}
+@media (max-height:500px) and (orientation:landscape){
+  .fm-bar{padding-block:4px 2px}.fm-note b{font-size:28px}.fm-note .fjp{font-size:18px}
+  .seg button,.fm-x{padding:5px 9px}.fm-row{padding-bottom:2px}.fm-row #fmMsg{flex-basis:100%}
+}
 @media (max-width:640px){
   .stage{gap:12px}
   #rec{height:min(68vh,560px)}
@@ -269,13 +278,14 @@ section{display:flex;flex-direction:column;gap:14px}
   </section>
 </div>
 
-<div class="fm" id="fm" hidden role="dialog" aria-label="Finger mode">
+<div class="fm" id="fm" hidden role="dialog" aria-label="Finger mode"><div class="fm-in">
   <div class="fm-bar">
     <div class="fm-note"><b id="fmNote">C</b><span class="fjp" id="fmJp"></span><span class="ftg" id="fmTgt"></span></div>
     <div class="seg" role="group" aria-label="How to blow">
       <button type="button" data-mode="touch" aria-pressed="true">Touch 触摸</button>
       <button type="button" data-mode="mic" aria-pressed="false">Mic 吹气</button>
     </div>
+    <button type="button" class="fm-x" id="fmFlip" aria-pressed="false" title="Put the mouthpiece at the phone's microphone end, then hold the phone upside down">Flip ⇅</button>
     <button type="button" class="fm-x" id="fmExit">Exit</button>
   </div>
   <div class="fm-row">
@@ -292,7 +302,7 @@ section{display:flex;flex-direction:column;gap:14px}
     <div class="fm-tube" id="fmTube"></div>
     <div class="fm-hint" id="fmHint">Tap empty space to tongue a repeated note. 点空白处吐音</div>
   </div>
-</div>
+</div></div>
 
 <script>
 (() => {
@@ -698,24 +708,41 @@ function buildFM(){
   mk(6,2,'½',true); mk(7,2,'½',true);
   layoutFM();
 }
+let flipped=false;
 function layoutFM(){
   const w=field.clientWidth, h=field.clientHeight; if(!w||!h) return;
-  let P=Math.min(h/8, w*0.24, 118); const s=(h-P-16)/6.6; P=Math.min(P, s*0.9);
-  const cx=Math.min(w*0.6, w-P*1.6);
-  const tube=$('fmTube'); tube.style.left=(cx-P*0.72)+'px'; tube.style.width=(P*1.44)+'px';
-  const y=i=>8+P/2+s*(i-1)+(i>=4?0.6*s:0);
-  const pos={}; for(let i=1;i<=7;i++) pos[i+':1']=[cx,y(i),P/2];
-  const tx=Math.max(P*0.55+4, cx-P*1.75), ty=y(1)+s*0.5;
-  pos['0:1']=[tx,ty,P/2]; pos['0:2']=[tx,ty-P*0.85,P*0.3];
-  pos['6:2']=[cx+P*0.92,y(6),P*0.3]; pos['7:2']=[cx+P*0.92,y(7),P*0.3];
+  const tube=$('fmTube'), hint=$('fmHint'), pos={};
+  const horiz=w>h*1.15;   // phone sideways: lay the recorder flat, mouthpiece on the left
+  tube.classList.toggle('horiz',horiz);
+  if(horiz){
+    let P=Math.min(h/2.7, w/9, 118);
+    const x1=8+P*1.45; const s=(w-16-P*0.6-x1)/6.6; P=Math.min(P,s*0.9);
+    const cy=Math.max(P/2+10, Math.min(h*0.38, h-P*2.05));
+    Object.assign(tube.style,{left:'4px',width:(w-8)+'px',top:(cy-P*0.72)+'px',height:(P*1.44)+'px',bottom:'auto'});
+    const x=i=>x1+s*(i-1)+(i>=4?0.6*s:0);
+    for(let i=1;i<=7;i++) pos[i+':1']=[x(i),cy,P/2];
+    const tx=x1-P*0.3, ty=cy+P*1.3;   // left thumb sits under hole 1, as on the real instrument
+    pos['0:1']=[tx,ty,P/2]; pos['0:2']=[tx-P*0.9,ty,P*0.3];
+    pos['6:2']=[x(6),cy+P*0.95,P*0.3]; pos['7:2']=[x(7),cy+P*0.95,P*0.3];
+    Object.assign(hint.style,{left:(x(2)-P/2)+'px',maxWidth:Math.max(120,x(5)-x(2))+'px'});
+  }else{
+    let P=Math.min(h/8, w*0.24, 118); const s=(h-P-16)/6.6; P=Math.min(P, s*0.9);
+    const cx=Math.min(w*0.6, w-P*1.6);
+    Object.assign(tube.style,{left:(cx-P*0.72)+'px',width:(P*1.44)+'px',top:'0px',height:'auto',bottom:'0px'});
+    const y=i=>8+P/2+s*(i-1)+(i>=4?0.6*s:0);
+    for(let i=1;i<=7;i++) pos[i+':1']=[cx,y(i),P/2];
+    const tx=Math.max(P*0.55+4, cx-P*1.75), ty=y(1)+s*0.5;
+    pos['0:1']=[tx,ty,P/2]; pos['0:2']=[tx,ty-P*0.85,P*0.3];
+    pos['6:2']=[cx+P*0.92,y(6),P*0.3]; pos['7:2']=[cx+P*0.92,y(7),P*0.3];
+    Object.assign(hint.style,{left:'0px',maxWidth:Math.max(90,cx-P*1.1-8)+'px'});
+  }
   zones=[];
   fmPads.forEach(d=>{const [x,yy,r]=pos[d.dataset.i+':'+d.dataset.v];
     d.style.left=x+'px'; d.style.top=yy+'px'; d.style.width=d.style.height=(r*2)+'px';
     zones.push({i:+d.dataset.i,v:+d.dataset.v,x,y:yy,r,tab:d.classList.contains('tab')})});
-  $('fmHint').style.maxWidth=Math.max(90,cx-P*1.1-8)+'px';
 }
 function hitZone(cX,cY){
-  const b=field.getBoundingClientRect(), x=cX-b.left, y=cY-b.top; let best=null, bd=1e9;
+  const b=field.getBoundingClientRect(), x=flipped?b.right-cX:cX-b.left, y=flipped?b.bottom-cY:cY-b.top; let best=null, bd=1e9;
   for(const z of zones){ const d=Math.hypot(x-z.x,y-z.y)/z.r; const lim=z.tab?1.25:1.3; if(d<lim&&d<bd){bd=d;best=z} }
   return best?{i:best.i,v:best.v}:{air:true};
 }
@@ -765,9 +792,9 @@ async function setFmMode(m){
   fmMode=m; document.querySelectorAll('.seg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.mode===m));
   breath(false); micStop();
   $('fmMic').hidden=m!=='mic'; $('fmHint').hidden=m!=='touch';
-  if(m==='touch'){ fmText('Touch the holes to play. Sound plays while any finger is down.'); return }
+  if(m==='touch'){ fmText(field.clientWidth>field.clientHeight*1.15?'Lay the phone flat and play with your fingers in a row. Sound plays while any finger is down.':'Hold the phone upright like a recorder: left hand on 1–3, right hand on 4–7. Sound plays while any finger is down. Turn sideways to play flat on a table.'); return }
   fmText('Allow the microphone, keep fingers on the holes, and blow gently across the bottom of the phone.');
-  try{ await micStart(); fmText('Blow across the mic to play. Say "tu" into it to tongue notes.') }
+  try{ await micStart(); fmText(flipped?'Blow gently at the microphone end. Say "tu" to tongue notes.':'Blow across the mic to play. Tip: press Flip and hold the phone upside down, so the mic is the mouthpiece.') }
   catch(err){ fmText('The microphone is not available here, so Touch mode is back on. Open the GitHub Pages version over https and allow the mic.'); setTimeout(()=>{ if(fmMode==='mic') setFmMode('touch') },2600) }
 }
 document.querySelectorAll('.seg button').forEach(b=>b.addEventListener('click',()=>{ensure();setFmMode(b.dataset.mode)}));
@@ -803,7 +830,7 @@ function openFM(){
   try{ navigator.wakeLock&&navigator.wakeLock.request('screen').then(l=>wake=l).catch(()=>{}) }catch(_){}
 }
 function closeFM(){
-  micStop(); touches.clear(); clearTimeout(offTimer); stopSong(); releaseAll();
+  micStop(); touches.clear(); clearTimeout(offTimer); stopSong(); releaseAll(); if(flipped) setFlip(false);
   fm.hidden=true; document.body.style.overflow='';
   try{ document.fullscreenElement&&document.exitFullscreen().catch(()=>{}) }catch(_){}
   try{ wake&&wake.release(); wake=null }catch(_){}
@@ -811,6 +838,9 @@ function closeFM(){
 }
 $('fmOpen').addEventListener('click',openFM);
 $('fmExit').addEventListener('click',closeFM);
+function setFlip(on){ flipped=on; fm.classList.toggle('flip',on); $('fmFlip').setAttribute('aria-pressed',on); layoutFM();
+  fmText(on?'Flipped: hold the phone upside down so its microphone end is at your lips, like the mouthpiece.':'Mouthpiece is at the top of the screen.') }
+$('fmFlip').addEventListener('click',()=>setFlip(!flipped));
 window.addEventListener('resize',()=>{ if(!fm.hidden) layoutFM() });
 $('fmSong').addEventListener('change',e=>{ stopSong(); song=SONGS.find(s=>s.id===e.target.value); buildTabs(); buildSong(); render() });
 $('fmListen').addEventListener('click',()=>{ touches.clear(); breath(false); $('listen').click(); fmText(`Listening to ${song.zh}…`) });
