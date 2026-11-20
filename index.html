@@ -310,6 +310,21 @@ section{display:flex;flex-direction:column;gap:14px}
 #langpick button:hover,#langpick button:focus-visible{border-color:var(--accent);outline:0;box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 30%,transparent)}
 body.picking{overflow:hidden}
 .songmeta .alt{color:var(--muted)}
+/* phone layout fixes */
+.fm-bar{flex-wrap:nowrap}
+.fm-note{flex:1 1 auto;min-width:0;overflow:hidden;margin-right:0}
+.fm-x.ico{width:40px;height:38px;padding:0;font-size:18px;line-height:1;flex:none;display:grid;place-items:center}
+.fm-x[aria-expanded="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.fm .seg{flex:none}
+.fm-more{display:flex;flex-direction:column;gap:6px;padding-bottom:6px;border-bottom:1px solid var(--line);margin-bottom:4px}
+.fm-row label{display:inline-flex;align-items:center;gap:6px}
+.fm-row input[type=range]{width:90px}
+.fm-msg{font-size:12px;color:var(--muted);line-height:1.4;padding-bottom:6px;min-height:1.4em}
+.fm-msg .ftg{color:var(--guide);font-weight:600}
+.fp{background:radial-gradient(circle,var(--hole) 0 27%,transparent 28%),var(--wood-hi)}
+.fp.tab{background:var(--wood-mid)}
+.fact span.hzl{text-transform:none}
+:lang(zh-Hans) .eyebrow,:lang(zh-Hans) .fact span,:lang(zh-Hans) .tfacts span{letter-spacing:.04em}
 .toast{position:fixed;left:0;right:0;bottom:0;z-index:60;display:flex;align-items:center;gap:10px;
   padding:12px max(16px,env(safe-area-inset-right,0px)) calc(12px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));
   background:var(--ink);color:var(--bg);font-size:14px}
@@ -319,6 +334,13 @@ body.picking{overflow:hidden}
 .toast[hidden]{display:none}
 .offline{font-size:12px;color:var(--muted);margin:0}
 @media (max-width:640px){
+  .controls{display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:center}
+  .controls .ctl{grid-column:1/-1;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:center}
+  .controls .ctl > span:first-child{white-space:nowrap}
+  .controls .ctl select,.controls .ctl input[type=range]{width:100%;min-width:0}
+  .controls label[for="vib"]{display:flex}
+  .controls .ghost{width:100%}
+  .controls #calib{grid-column:1/-1}
   .tabs{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;scrollbar-width:thin}
   .tab{flex:none}
   .stage{gap:12px}
@@ -361,7 +383,7 @@ body.picking{overflow:hidden}
           <div class="fact"><b id="jp"><span class="jpn">1</span></b><span data-t="fJp">Jianpu</span></div>
           <div class="fact"><b id="solf">do</b><span data-t="fSolf">Solfège</span></div>
           <div class="fact"><b id="sci">C5</b><span data-t="fSounds">Sounds</span></div>
-          <div class="fact"><b class="hz" id="hz">523.3</b><span>Hz</span></div>
+          <div class="fact"><b class="hz" id="hz">523.3</b><span class="hzl">Hz</span></div>
         </div>
         <div class="status" id="status">Standard fingering</div>
       </div>
@@ -507,28 +529,37 @@ body.picking{overflow:hidden}
 
 <div class="fm" id="fm" hidden role="dialog" data-ta="aria-label:fm"><div class="fm-in">
   <div class="fm-bar">
-    <div class="fm-note"><b id="fmNote">C</b><span class="fjp" id="fmJp"></span><span class="ftg" id="fmTgt"></span></div>
+    <div class="fm-note"><b id="fmNote">–</b><span class="fjp" id="fmJp"></span></div>
     <div class="seg" role="group" data-ta="aria-label:howBlow">
       <button type="button" data-mode="touch" aria-pressed="true" data-t="touch">Touch</button>
       <button type="button" data-mode="mic" aria-pressed="false" data-t="mic">Mic</button>
     </div>
-    <button type="button" class="fm-x" id="fmFlip" aria-pressed="false" data-ta="title:flipTitle"><span data-t="flip">Flip</span> ⇅</button>
-    <button type="button" class="fm-x" id="fmExit" data-t="exit">Exit</button>
+    <button type="button" class="fm-x ico" id="fmFlip" aria-pressed="false" data-ta="aria-label:flip;title:flipTitle">⇅</button>
+    <button type="button" class="fm-x ico" id="fmMore" aria-expanded="false" data-ta="aria-label:more;title:more">⋯</button>
+    <button type="button" class="fm-x ico" id="fmExit" data-ta="aria-label:exit;title:exit">✕</button>
   </div>
-  <div class="fm-row">
-    <select id="fmSong" data-ta="aria-label:song"></select>
-    <button type="button" id="fmListen" data-t="listen">Listen</button>
-    <button type="button" id="fmPractice" data-t="practice">Practice</button>
-    <button type="button" id="fmAlong" data-t="along">Play along</button>
-    <span id="fmMic" hidden><span style="display:inline-flex;align-items:center;gap:6px"><span data-t="breath">Breath</span> <span class="meter" id="meter"><i></i></span><span id="breathTxt">–</span></span>
-      <label for="sens" style="display:inline-flex;align-items:center;gap:6px;margin-left:8px"><span data-t="sensitivity">Sensitivity</span> <input id="sens" type="range" min="1" max="100" value="55" style="width:80px"></label></span>
-    <span style="display:inline-flex;align-items:center;gap:6px"><span data-t="sync">Sync</span> <input id="sync2" type="range" min="-300" max="800" step="10" value="0" style="width:80px" data-ta="aria-label:fsync"> <span id="syncv2">0 ms</span></span>
-    <button type="button" id="calib2" data-t="tapSync">Tap to sync</button>
-    <span class="fm-metro"><button type="button" id="fmMetro" aria-pressed="false">♩ <span id="fmBpm">96</span></button><span class="mdots" id="fmDots" aria-hidden="true"></span></span>
-    <button type="button" id="fmFit" data-t="fit">Fit to hand</button>
-    <button type="button" id="fmFitReset" hidden data-t="stdLayout">Standard layout</button>
-    <span id="fmMsg"></span>
+  <div class="fm-row" id="fmMic" hidden>
+    <span data-t="breath">Breath</span> <span class="meter" id="meter"><i></i></span><span id="breathTxt">–</span>
+    <label for="sens"><span data-t="sensitivity">Sensitivity</span> <input id="sens" type="range" min="1" max="100" value="55"></label>
   </div>
+  <div class="fm-more" id="fmPanel" hidden>
+    <div class="fm-row">
+      <select id="fmSong" data-ta="aria-label:song"></select>
+      <button type="button" id="fmListen" data-t="listen">Listen</button>
+      <button type="button" id="fmPractice" data-t="practice">Practice</button>
+      <button type="button" id="fmAlong" data-t="along">Play along</button>
+    </div>
+    <div class="fm-row">
+      <span class="fm-metro"><button type="button" id="fmMetro" aria-pressed="false">♩ <span id="fmBpm">96</span></button><span class="mdots" id="fmDots" aria-hidden="true"></span></span>
+      <label for="sync2"><span data-t="sync">Sync</span> <input id="sync2" type="range" min="-300" max="800" step="10" value="0"> <span id="syncv2">0 ms</span></label>
+      <button type="button" id="calib2" data-t="tapSync">Tap to sync</button>
+    </div>
+    <div class="fm-row">
+      <button type="button" id="fmFit" data-t="fit">Fit to hand</button>
+      <button type="button" id="fmFitReset" hidden data-t="stdLayout">Standard layout</button>
+    </div>
+  </div>
+  <div class="fm-msg"><span class="ftg" id="fmTgt"></span> <span id="fmMsg"></span></div>
   <div class="fm-field" id="fmField">
     <div class="fm-tube" id="fmTube"></div>
     <div class="fm-hint" id="fmHint" data-t="hint">Tap empty space to tongue a repeated note.</div>
@@ -636,7 +667,7 @@ const STR={
  exit:['Exit','退出','Keluar'], song:['Song','歌曲','Lagu'], breath:['Breath','气息','Nafas'], sensitivity:['Sensitivity','灵敏度','Kepekaan'], sync:['Sync','同步','Selaras'],
  fit:['Fit to hand','按手定位','Ikut tangan'], stdLayout:['Standard layout','标准布局','Susun atur standard'],
  hint:['Tap empty space to tongue a repeated note.','点空白处吐音（重复同一个音）。','Ketik ruang kosong untuk menyebut semula not yang berulang.'],
- next:['next {n}','下一个 {n}','seterusnya {n}'],
+ next:['Next: {n}.','下一个：{n}。','Seterusnya: {n}.'], more:['More','更多','Lagi'],
  moreAir:['more air','多点气','lebih udara'], lessAir:['less air','少点气','kurang udara'], goodB:['good','刚好','baik'], squeakS:['squeak!','破音！','cicit!'],
  fmFlat:['Lay the phone flat and play with your fingers in a row. Sound plays while any finger is down.','把手机平放，手指排成一排演奏。只要有手指按着就会发声。','Letakkan telefon rata dan main dengan jari dalam satu barisan. Bunyi keluar selagi ada jari menyentuh.'],
  fmUp:['Hold the phone upright like a recorder: left hand on 1–3, right hand on 4–7. Sound plays while any finger is down. Turn sideways to play flat on a table.','像竖笛一样竖着拿手机：左手按 1–3，右手按 4–7。只要有手指按着就会发声。横过来可以平放在桌上演奏。','Pegang telefon tegak seperti rekorder: tangan kiri pada 1–3, tangan kanan pada 4–7. Bunyi keluar selagi ada jari menyentuh. Pusingkan ke sisi untuk bermain rata di atas meja.'],
@@ -1508,8 +1539,9 @@ fm.addEventListener('touchmove',e=>e.preventDefault(),{passive:false});
 
 function renderFM(n,tgt){
   if(fm.hidden) return;
-  $('fmNote').textContent=(n.approx?'≈':'')+label(n.midi);
-  $('fmJp').innerHTML=jianpu(n.midi);
+  const idle=!blowing()&&touches.size===0&&holes.every(h=>!h);   // nothing touched yet: no guessed note
+  $('fmNote').textContent=idle?'–':(n.approx?'≈':'')+label(n.midi);
+  $('fmJp').innerHTML=idle?'':jianpu(n.midi);
   $('fmTgt').textContent=tgt!=null?TR('next',{n:label(tgt)}):'';
   const f=tgt!=null?[...table()[tgt]].map(dec):null;
   fmPads.forEach(d=>{const i=+d.dataset.i, v=+d.dataset.v, tab=d.classList.contains('tab');
@@ -1567,6 +1599,7 @@ function micStop(){ BR.r=1; if(!mic) return; cancelAnimationFrame(mic.raf); mic.
 function openFM(){
   ensure(); stopSong(); releaseAll(); touches.clear(); holes=[0,0,0,0,0,0,0,0];
   fm.hidden=false; document.body.style.overflow='hidden';
+  $('fmPanel').hidden=true; $('fmMore').setAttribute('aria-expanded','false');
   fillFmSongs();
   buildFM(); setFmMode('touch'); render();
   try{ fm.requestFullscreen&&fm.requestFullscreen().catch(()=>{}) }catch(_){}
@@ -1582,6 +1615,9 @@ function closeFM(){
 }
 $('fmOpen').addEventListener('click',openFM);
 $('fmExit').addEventListener('click',closeFM);
+$('fmMore').addEventListener('click',()=>{ const open=$('fmPanel').hidden; $('fmPanel').hidden=!open; $('fmMore').setAttribute('aria-expanded',open) });
+// Re-measure the holes whenever the playing area changes size (messages wrapping, panels opening, rotation).
+if(window.ResizeObserver) new ResizeObserver(()=>{ if(!fm.hidden) layoutFM() }).observe(field);
 
 /* ---------- fit to hand ---------- */
 let HAND={}, fit=null;
@@ -1602,6 +1638,7 @@ function fitTap(e){
 function endFit(){ fit=null; field.classList.remove('fitting'); field.querySelectorAll('.fitdot').forEach(d=>d.remove()); layoutFM(); render() }
 $('fmFit').addEventListener('click',()=>{
   if(fit){ endFit(); fmText(TR('fitCancel')); return }
+  $('fmPanel').hidden=true; $('fmMore').setAttribute('aria-expanded','false');   // full-size field while fitting
   touches.clear(); breath(false); applyTouches(); fit={pts:[]}; field.classList.add('fitting');
   fmText(TR('fitStart',{p:fitPrompt()}));
 });
