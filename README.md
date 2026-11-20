@@ -6,6 +6,9 @@ A playable soprano recorder in one web page. Tap the holes to cover them, hold *
 
 It is an installable app (PWA) that works offline. Open the link once while online; after that it runs with no internet, even in airplane mode. The bottom of the page says "Saved on this device: works offline" when it is ready.
 
+## Languages 语言 · Bahasa
+The app speaks **中文, English and Bahasa Melayu**. On the very first launch a full-screen picker asks which one; the choice is remembered on that device. Change it any time with the **Language** menu at the top of the page.
+
 ## On a phone
 1. Open the link above in Safari (iPhone) or Chrome (Android).
 2. Turn the ringer/silent switch off on iPhone, or web audio may be muted.
