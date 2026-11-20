@@ -6,6 +6,9 @@ A playable soprano recorder in one web page. Tap the holes to cover them, hold *
 
 It is an installable app (PWA) that works offline. Open the link once while online; after that it runs with no internet, even in airplane mode. The bottom of the page says "Saved on this device: works offline" when it is ready.
 
+## Share 分享
+The **Share** section (also the ↗ Share button at the top) has a QR code for this repository, a **Send on WhatsApp** button with a ready-made message in the current language, **Copy link**, and on phones that support it, the phone's own share sheet. The QR code is built into the page, so it shows even offline.
+
 ## Languages 语言 · Bahasa
 The app speaks **中文, English and Bahasa Melayu**. On the very first launch a full-screen picker asks which one; the choice is remembered on that device. Change it any time with the **Language** menu at the top of the page.
 

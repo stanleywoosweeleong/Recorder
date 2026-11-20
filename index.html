@@ -399,6 +399,15 @@ body.docked{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
 :focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .fact > span,.tfacts > div > span,.tscale{font-size:12px}
 .chip .l{font-size:11px}
+/* share */
+.sharebox{display:flex;flex-wrap:wrap;gap:20px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+.qrwrap{margin:0;display:flex;flex-direction:column;align-items:center;gap:6px}
+.qr{width:180px;height:180px;display:block;border-radius:8px}
+.qrwrap figcaption{font-size:12px;color:var(--muted);font-family:var(--f-mono);max-width:200px;text-align:center;word-break:break-all}
+.sharebtns{display:flex;flex-direction:column;gap:10px;flex:1 1 220px;min-width:0}
+.sharebtns .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;text-decoration:none;font-size:15px}
+.btn.wa{background:var(--accent);color:var(--accent-ink)}
+.surl{width:100%;min-width:0;font:13px var(--f-mono);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
 .toast{position:fixed;left:0;right:0;bottom:0;z-index:60;display:flex;align-items:center;gap:10px;
   padding:12px max(16px,env(safe-area-inset-right,0px)) calc(12px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));
   background:var(--ink);color:var(--bg);font-size:14px}
@@ -408,6 +417,8 @@ body.docked{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
 .toast[hidden]{display:none}
 .offline{font-size:12px;color:var(--muted);margin:0}
 @media (max-width:640px){
+  .sharebox{flex-direction:column;align-items:stretch}
+  .qr{width:200px;height:200px}
   .starts{grid-template-columns:1fr}
   .start{min-height:56px;padding:10px 12px}
   .guide{padding:10px 12px;gap:10px}
@@ -444,6 +455,7 @@ body.docked{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
     <div class="toprow">
       <div class="eyebrow" id="eyebrow">Soprano · C · Baroque or German fingering</div>
       <div class="topctl">
+      <button type="button" class="ghost setbtn" id="shareBtn" aria-controls="shareSec"><span aria-hidden="true">↗</span> <span data-t="share">Share</span></button>
       <button type="button" class="ghost setbtn" id="setBtn" aria-controls="settingsSec"><span aria-hidden="true">⚙</span> <span data-t="settings">Settings</span></button>
       <label class="ctl langctl" for="langSel"><span data-t="lang">Language</span>
         <select id="langSel"><option value="zh" lang="zh-Hans">中文</option><option value="en" lang="en">English</option><option value="ms" lang="ms">Bahasa Melayu</option></select>
@@ -599,6 +611,20 @@ body.docked{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
         <div><span data-t="notesHeard">Notes heard</span><b id="tCount">0</b></div>
       </div>
       <p class="tmsg" id="tMsg"></p>
+    </div>
+  </section>
+
+  <section id="shareSec">
+    <div class="sechead"><h2 data-t="share">Share</h2><span class="tip" data-t="shareTip">Scan the code or send the link.</span></div>
+    <div class="sharebox">
+      <figure class="qrwrap"><svg class="qr" id="qrSvg" viewBox="0 0 41 41" role="img" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg"><rect width="41" height="41" fill="#fff"/><path fill="#000" d="M4 4h7v1h-7zM15 4h4v1h-4zM20 4h6v1h-6zM27 4h1v1h-1zM30 4h7v1h-7zM4 5h1v1h-1zM10 5h1v1h-1zM13 5h1v1h-1zM15 5h1v1h-1zM17 5h5v1h-5zM25 5h2v1h-2zM30 5h1v1h-1zM36 5h1v1h-1zM4 6h1v1h-1zM6 6h3v1h-3zM10 6h1v1h-1zM12 6h1v1h-1zM14 6h4v1h-4zM20 6h3v1h-3zM24 6h2v1h-2zM30 6h1v1h-1zM32 6h3v1h-3zM36 6h1v1h-1zM4 7h1v1h-1zM6 7h3v1h-3zM10 7h1v1h-1zM12 7h4v1h-4zM18 7h1v1h-1zM20 7h1v1h-1zM24 7h1v1h-1zM26 7h1v1h-1zM28 7h1v1h-1zM30 7h1v1h-1zM32 7h3v1h-3zM36 7h1v1h-1zM4 8h1v1h-1zM6 8h3v1h-3zM10 8h1v1h-1zM12 8h1v1h-1zM14 8h2v1h-2zM19 8h1v1h-1zM22 8h1v1h-1zM25 8h1v1h-1zM27 8h1v1h-1zM30 8h1v1h-1zM32 8h3v1h-3zM36 8h1v1h-1zM4 9h1v1h-1zM10 9h1v1h-1zM12 9h3v1h-3zM16 9h2v1h-2zM19 9h2v1h-2zM22 9h1v1h-1zM24 9h1v1h-1zM28 9h1v1h-1zM30 9h1v1h-1zM36 9h1v1h-1zM4 10h7v1h-7zM12 10h1v1h-1zM14 10h1v1h-1zM16 10h1v1h-1zM18 10h1v1h-1zM20 10h1v1h-1zM22 10h1v1h-1zM24 10h1v1h-1zM26 10h1v1h-1zM28 10h1v1h-1zM30 10h7v1h-7zM12 11h5v1h-5zM18 11h2v1h-2zM25 11h1v1h-1zM27 11h2v1h-2zM4 12h1v1h-1zM6 12h5v1h-5zM16 12h4v1h-4zM21 12h1v1h-1zM24 12h1v1h-1zM30 12h5v1h-5zM6 13h3v1h-3zM11 13h4v1h-4zM16 13h1v1h-1zM18 13h1v1h-1zM20 13h1v1h-1zM22 13h4v1h-4zM27 13h1v1h-1zM30 13h2v1h-2zM33 13h2v1h-2zM36 13h1v1h-1zM4 14h1v1h-1zM6 14h2v1h-2zM9 14h3v1h-3zM14 14h1v1h-1zM16 14h1v1h-1zM19 14h2v1h-2zM22 14h1v1h-1zM24 14h3v1h-3zM28 14h3v1h-3zM32 14h1v1h-1zM34 14h2v1h-2zM11 15h4v1h-4zM18 15h1v1h-1zM20 15h1v1h-1zM23 15h1v1h-1zM25 15h2v1h-2zM28 15h3v1h-3zM32 15h4v1h-4zM4 16h1v1h-1zM7 16h1v1h-1zM10 16h5v1h-5zM16 16h1v1h-1zM22 16h1v1h-1zM26 16h2v1h-2zM29 16h1v1h-1zM31 16h3v1h-3zM35 16h1v1h-1zM4 17h6v1h-6zM12 17h1v1h-1zM16 17h6v1h-6zM24 17h1v1h-1zM26 17h2v1h-2zM29 17h1v1h-1zM31 17h1v1h-1zM33 17h1v1h-1zM35 17h2v1h-2zM10 18h1v1h-1zM12 18h1v1h-1zM14 18h1v1h-1zM16 18h1v1h-1zM21 18h1v1h-1zM23 18h1v1h-1zM26 18h1v1h-1zM29 18h2v1h-2zM32 18h1v1h-1zM34 18h2v1h-2zM5 19h1v1h-1zM7 19h1v1h-1zM9 19h1v1h-1zM12 19h1v1h-1zM14 19h1v1h-1zM18 19h1v1h-1zM20 19h1v1h-1zM22 19h4v1h-4zM27 19h1v1h-1zM29 19h2v1h-2zM33 19h2v1h-2zM4 20h1v1h-1zM7 20h1v1h-1zM9 20h2v1h-2zM12 20h4v1h-4zM17 20h2v1h-2zM21 20h1v1h-1zM23 20h2v1h-2zM26 20h4v1h-4zM31 20h2v1h-2zM36 20h1v1h-1zM5 21h1v1h-1zM7 21h1v1h-1zM9 21h1v1h-1zM11 21h2v1h-2zM15 21h1v1h-1zM17 21h1v1h-1zM20 21h6v1h-6zM27 21h1v1h-1zM30 21h2v1h-2zM33 21h2v1h-2zM36 21h1v1h-1zM6 22h1v1h-1zM8 22h5v1h-5zM14 22h2v1h-2zM17 22h1v1h-1zM19 22h3v1h-3zM24 22h1v1h-1zM28 22h1v1h-1zM31 22h2v1h-2zM34 22h2v1h-2zM4 23h3v1h-3zM8 23h1v1h-1zM12 23h3v1h-3zM16 23h3v1h-3zM20 23h6v1h-6zM30 23h6v1h-6zM4 24h2v1h-2zM7 24h1v1h-1zM10 24h1v1h-1zM19 24h2v1h-2zM23 24h3v1h-3zM28 24h2v1h-2zM31 24h3v1h-3zM35 24h1v1h-1zM4 25h2v1h-2zM8 25h1v1h-1zM11 25h3v1h-3zM15 25h1v1h-1zM19 25h1v1h-1zM21 25h2v1h-2zM25 25h1v1h-1zM27 25h1v1h-1zM30 25h1v1h-1zM33 25h2v1h-2zM36 25h1v1h-1zM4 26h1v1h-1zM6 26h1v1h-1zM10 26h1v1h-1zM13 26h1v1h-1zM18 26h3v1h-3zM24 26h1v1h-1zM29 26h1v1h-1zM31 26h5v1h-5zM4 27h1v1h-1zM6 27h2v1h-2zM11 27h2v1h-2zM17 27h3v1h-3zM22 27h1v1h-1zM25 27h6v1h-6zM32 27h5v1h-5zM4 28h1v1h-1zM10 28h1v1h-1zM14 28h2v1h-2zM17 28h5v1h-5zM26 28h1v1h-1zM28 28h5v1h-5zM35 28h2v1h-2zM12 29h2v1h-2zM15 29h1v1h-1zM17 29h1v1h-1zM20 29h1v1h-1zM22 29h2v1h-2zM25 29h1v1h-1zM27 29h2v1h-2zM32 29h1v1h-1zM34 29h1v1h-1zM36 29h1v1h-1zM4 30h7v1h-7zM15 30h2v1h-2zM18 30h3v1h-3zM22 30h1v1h-1zM24 30h2v1h-2zM27 30h2v1h-2zM30 30h1v1h-1zM32 30h1v1h-1zM34 30h2v1h-2zM4 31h1v1h-1zM10 31h1v1h-1zM12 31h2v1h-2zM15 31h1v1h-1zM18 31h2v1h-2zM24 31h2v1h-2zM27 31h2v1h-2zM32 31h5v1h-5zM4 32h1v1h-1zM6 32h3v1h-3zM10 32h1v1h-1zM12 32h2v1h-2zM15 32h1v1h-1zM18 32h1v1h-1zM22 32h2v1h-2zM25 32h1v1h-1zM28 32h6v1h-6zM35 32h1v1h-1zM4 33h1v1h-1zM6 33h3v1h-3zM10 33h1v1h-1zM12 33h1v1h-1zM17 33h1v1h-1zM19 33h2v1h-2zM24 33h1v1h-1zM27 33h3v1h-3zM32 33h2v1h-2zM36 33h1v1h-1zM4 34h1v1h-1zM6 34h3v1h-3zM10 34h1v1h-1zM12 34h2v1h-2zM16 34h3v1h-3zM23 34h1v1h-1zM26 34h1v1h-1zM30 34h2v1h-2zM33 34h1v1h-1zM4 35h1v1h-1zM10 35h1v1h-1zM13 35h1v1h-1zM17 35h2v1h-2zM20 35h1v1h-1zM23 35h4v1h-4zM29 35h1v1h-1zM32 35h3v1h-3zM4 36h7v1h-7zM12 36h5v1h-5zM20 36h2v1h-2zM23 36h1v1h-1zM26 36h4v1h-4zM31 36h1v1h-1zM35 36h1v1h-1z"/></svg><figcaption>github.com/stanleywoosweeleong/Recorder</figcaption></figure>
+      <div class="sharebtns">
+        <a class="btn wa" id="waLink" href="https://wa.me/?text=https://github.com/stanleywoosweeleong/Recorder" target="_blank" rel="noopener"><span aria-hidden="true">✆</span> <span data-t="shareWa">Send on WhatsApp</span></a>
+        <button class="btn alt" id="copyLink" type="button"><span aria-hidden="true">⧉</span> <span data-t="copyLink">Copy link</span></button>
+        <button class="btn alt" id="nativeShare" type="button" hidden><span aria-hidden="true">↗</span> <span data-t="shareMore">More ways to share</span></button>
+        <input id="shareInput" class="surl" readonly value="https://github.com/stanleywoosweeleong/Recorder" data-ta="aria-label:linkAria">
+        <p class="tip" id="shareStatus" role="status"></p>
+      </div>
     </div>
   </section>
 
@@ -788,6 +814,13 @@ const STR={
  hint:['Tap empty space to tongue a repeated note.','点空白处吐音（重复同一个音）。','Ketik ruang kosong untuk menyebut semula not yang berulang.'],
  next:['Next: {n}.','下一个：{n}。','Seterusnya: {n}.'], more:['More','更多','Lagi'],
  gNext:['Next','下一个','Seterusnya'],
+ share:['Share','分享','Kongsi'],
+ shareTip:['Scan the QR code or send the link to share this recorder app with friends and classmates.','扫二维码或发送链接，把这个竖笛应用分享给朋友和同学。','Imbas kod QR atau hantar pautan untuk berkongsi aplikasi rekorder ini dengan rakan dan rakan sekelas.'],
+ shareWa:['Send on WhatsApp','用 WhatsApp 发送','Hantar melalui WhatsApp'], copyLink:['Copy link','复制链接','Salin pautan'], shareMore:['More ways to share','其他分享方式','Cara lain untuk berkongsi'],
+ copied:['Link copied. Paste it anywhere.','链接已复制，可以粘贴到任何地方。','Pautan disalin. Tampal di mana-mana.'],
+ copyFail:['Copying is blocked here, so the link is selected: copy it from the box.','这里无法自动复制，链接已选中，请从框里复制。','Penyalinan disekat di sini, jadi pautan telah dipilih: salin dari kotak.'],
+ shareMsg:['Play the recorder (竖笛) on your phone or computer: {u}','在手机或电脑上吹竖笛：{u}','Main rekorder (竖笛) pada telefon atau komputer anda: {u}'],
+ qrAlt:['QR code linking to {u}','链接到 {u} 的二维码','Kod QR yang memaut ke {u}'], linkAria:['Link to share','分享链接','Pautan untuk dikongsi'],
  startAria:['Where to start','从哪里开始','Mula di mana'], close:['Close','关闭','Tutup'],
  startPlay:['Play the recorder','吹竖笛','Main rekorder'], startPlayD:['Cover holes and blow','按孔吹奏','Tutup lubang dan tiup'],
  startSong:['Practise a song','练一首歌','Berlatih lagu'], startSongD:['Listen, then play along','先听，再跟着吹','Dengar, kemudian main bersama'],
@@ -2009,6 +2042,8 @@ function applyLang(){
   $('loopBtn').textContent=TR(loopSel?'loopOn':loopPick!=null?'cancelLoop':'loop');
   if(!tuner){ $('tStatus').textContent=TR('tIdle'); $('tMsg').textContent=TR('tTip') }
   $('fitResetAll').textContent=TR('resetHands');
+  $('waLink').href='https://wa.me/?text='+encodeURIComponent(TR('shareMsg',{u:SHARE_URL}));
+  $('qrSvg').setAttribute('aria-label',TR('qrAlt',{u:SHARE_URL}));
   if(typeof renderMic==='function'){ renderMic(); rangeActions(); markUnavailable() }
   const sh=$('startHint'); if(!sh.hidden&&sh.dataset.k) $('startHintTxt').textContent=TR(sh.dataset.k);
   buildChart(); buildTabs(); buildSong(); mUI(); render();
@@ -2100,6 +2135,18 @@ function markUnavailable(){
   const hapOK={hole:canVib||isIOS,metro:canVib,wrong:canVib};
   [['hapHole','hole'],['hapMetro','metro'],['hapWrong','wrong']].forEach(([id,k])=>{ const c=$(id); c.disabled=!hapOK[k]; c.closest('label').classList.toggle('na',!hapOK[k]); c.closest('label').title=hapOK[k]?'':TR('hapNA') });
 }
+
+/* ---------- share: QR code, WhatsApp, copy link, the phone's own share sheet ---------- */
+const SHARE_URL='https://github.com/stanleywoosweeleong/Recorder';
+$('shareBtn').addEventListener('click',()=>$('shareSec').scrollIntoView({behavior:'smooth',block:'start'}));
+$('copyLink').addEventListener('click',()=>{
+  const say=k=>{ $('shareStatus').textContent=TR(k) };
+  const fallback=()=>{ const i=$('shareInput'); i.focus(); i.select(); let done=false; try{ done=document.execCommand('copy') }catch(_){} say(done?'copied':'copyFail') };
+  try{ navigator.clipboard.writeText(SHARE_URL).then(()=>say('copied'),fallback) }catch(_){ fallback() }
+});
+if(navigator.share){ $('nativeShare').hidden=false;
+  $('nativeShare').addEventListener('click',()=>{ navigator.share({title:document.title,text:TR('shareMsg',{u:''}).trim(),url:SHARE_URL}).catch(()=>{}) }) }
+$('shareInput').addEventListener('focus',e=>e.target.select());
 
 drawRecorder(); applyLang(); markUnavailable();
 if(FIRST_LAUNCH){ showLangPick(true); $('langpick').focus() }
