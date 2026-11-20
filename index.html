@@ -327,6 +327,42 @@ body.picking{overflow:hidden}
 .fp.tab{background:var(--wood-mid)}
 .fact span.hzl{text-transform:none}
 :lang(zh-Hans) .eyebrow,:lang(zh-Hans) .fact span,:lang(zh-Hans) .tfacts span{letter-spacing:.04em}
+/* home screen, song actions, practice guidance */
+.topctl{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.setbtn{display:inline-flex;align-items:center;gap:6px;min-height:36px}
+.guide{display:flex;gap:14px;align-items:center;background:color-mix(in srgb,var(--guide) 13%,var(--surface));border:2px solid var(--guide);border-radius:14px;padding:12px 16px}
+.guide.ok{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,var(--surface))}
+.gmini svg{display:block;width:26px;height:78px}
+.gbody{min-width:0}
+.ghead{font-size:14px;color:var(--muted);display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.ghead b{font-family:var(--f-display);font-weight:800;font-size:40px;line-height:1;color:var(--ink)}
+.gjp{font-family:var(--f-display);font-weight:700;font-size:22px;color:var(--ink)}
+.gtxt{font-size:15px;margin-top:6px;line-height:1.45;color:var(--ink)}
+.gtxt .cv{color:var(--guide);font-weight:700}.gtxt .lf{color:var(--bad);font-weight:700}
+.guide.ok .gtxt{color:var(--accent);font-weight:700}
+.cue{font:800 16px var(--f-body);text-anchor:middle;pointer-events:none}
+.cue.cover{fill:var(--guide)}.cue.lift{fill:var(--bad)}.cue.ok{fill:var(--accent)}
+.fp[data-cue]::after{content:attr(data-cue);position:absolute;top:-4px;right:-4px;min-width:22px;height:22px;border-radius:11px;display:grid;place-items:center;font:800 13px var(--f-body);background:var(--guide);color:#fff;padding:0 4px}
+.fp[data-cue="✓"]::after{background:var(--accent);color:var(--accent-ink)}
+.fp[data-cue="↑"]::after{background:var(--bad)}
+.songopts{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center}
+.songact{display:flex;flex-wrap:wrap;gap:10px;align-items:stretch}
+.actgroup{display:flex;flex:1 1 320px;border-radius:12px;overflow:hidden;border:1.5px solid var(--ink);min-width:0}
+.act{flex:1;min-height:48px;border:0;background:transparent;color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;padding:8px 10px;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.act+.act{border-left:1.5px solid var(--ink)}
+.act[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.act:hover{background:color-mix(in srgb,var(--ink) 8%,transparent)}
+.act[aria-pressed="true"]:hover{background:var(--ink)}
+.stopb{min-height:48px;display:inline-flex;align-items:center;gap:6px}
+.stopb:disabled{opacity:.4;cursor:not-allowed}
+.setwrap{border-top:1px solid var(--line);padding-top:14px}
+.setwrap>summary{cursor:pointer;list-style:none;display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 12px;padding:6px 0 12px}
+.setwrap>summary::-webkit-details-marker{display:none}
+.setwrap>summary::before{content:"▸";color:var(--accent);font-size:18px;transition:transform .15s}
+.setwrap[open]>summary::before{transform:rotate(90deg)}
+.settings .ctl{display:flex;align-items:center;gap:10px;justify-content:space-between;flex-wrap:wrap}
+.settings .ctl input[type=range]{flex:1;min-width:120px}
+.tip{color:color-mix(in srgb,var(--muted) 85%,var(--ink))}
 .toast{position:fixed;left:0;right:0;bottom:0;z-index:60;display:flex;align-items:center;gap:10px;
   padding:12px max(16px,env(safe-area-inset-right,0px)) calc(12px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));
   background:var(--ink);color:var(--bg);font-size:14px}
@@ -336,6 +372,10 @@ body.picking{overflow:hidden}
 .toast[hidden]{display:none}
 .offline{font-size:12px;color:var(--muted);margin:0}
 @media (max-width:640px){
+  .guide{padding:10px 12px;gap:10px}
+  .ghead b{font-size:34px}
+  .act{font-size:14px;padding:8px 6px}
+  .stopb{flex:1 1 100%;justify-content:center}
   .instrument{grid-row:auto}
   .console-extra{grid-column:1/-1}
   .mhead .mtog{margin-left:auto}
@@ -343,9 +383,7 @@ body.picking{overflow:hidden}
   .controls .ctl{grid-column:1/-1;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:center}
   .controls .ctl > span:first-child{white-space:nowrap}
   .controls .ctl select,.controls .ctl input[type=range]{width:100%;min-width:0}
-  .controls label[for="vib"]{display:flex}
   .controls .ghost{width:100%}
-  .controls #calib{grid-column:1/-1}
   .tabs{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;scrollbar-width:thin}
   .tab{flex:none}
   .stage{gap:12px}
@@ -367,9 +405,12 @@ body.picking{overflow:hidden}
   <header>
     <div class="toprow">
       <div class="eyebrow" id="eyebrow">Soprano · C · Baroque or German fingering</div>
+      <div class="topctl">
+      <button type="button" class="ghost setbtn" id="setBtn" aria-controls="settingsSec"><span aria-hidden="true">⚙</span> <span data-t="settings">Settings</span></button>
       <label class="ctl langctl" for="langSel"><span data-t="lang">Language</span>
         <select id="langSel"><option value="zh" lang="zh-Hans">中文</option><option value="en" lang="en">English</option><option value="ms" lang="ms">Bahasa Melayu</option></select>
       </label>
+      </div>
     </div>
     <h1 data-t="appName">Soprano Recorder</h1>
     <p class="lede" data-th="lede">Tap the holes to cover them, then hold <b>Blow</b> to play.</p>
@@ -393,21 +434,20 @@ body.picking{overflow:hidden}
         <div class="status" id="status">Standard fingering</div>
       </div>
 
+      <div class="guide" id="guide" hidden aria-live="polite">
+        <div class="gmini" id="gMini" aria-hidden="true"></div>
+        <div class="gbody">
+          <div class="ghead"><span data-t="gNext">Next</span> <b id="gNote">G</b> <span class="gjp" id="gJp"></span></div>
+          <div class="gtxt" id="gTxt"></div>
+        </div>
+      </div>
+
       <button class="blow" id="blow" type="button" data-ta="aria-label:blowAria">
         <b data-t="blow">Blow</b><small data-t="blowSub">Hold here, or hold the space bar</small>
       </button>
 
       <div class="controls">
-        <label class="ctl" for="sys"><span data-t="fingering">Fingering</span>
-          <select id="sys"><option value="baroque" data-t="baroque">Baroque</option><option value="german" data-t="german">German</option></select>
-        </label>
-        <label class="ctl" for="inst"><span data-t="recorder">Recorder</span>
-          <select id="inst"><option value="soprano" data-t="soprano">Soprano (C)</option><option value="alto" data-t="alto">Alto (F)</option></select>
-        </label>
         <label class="ctl" for="vol"><span data-t="volume">Volume</span> <input id="vol" type="range" min="0" max="100" value="70"></label>
-        <label class="ctl" for="vib"><input id="vib" type="checkbox" checked> <span data-t="vibrato">Vibrato</span></label>
-        <label class="ctl" for="sync" data-ta="title:fsyncTitle"><span data-t="fsync">Finger sync</span> <input id="sync" type="range" min="-300" max="800" step="10" value="0"> <span id="syncv">0 ms</span></label>
-        <button class="ghost" id="calib" type="button" data-t="tapSync">Tap to sync</button>
         <button class="ghost" id="openAll" type="button" data-t="openAll">Open all</button>
         <button class="ghost" id="closeAll" type="button" data-t="coverAll">Cover all</button>
       </div>
@@ -455,23 +495,25 @@ body.picking{overflow:hidden}
     <div class="songbook">
       <div class="tabs" id="tabs" role="tablist"></div>
       <div class="songmeta" id="songmeta"></div>
-      <div class="row">
+      <div class="songopts">
         <div class="seg" id="viewSeg" role="group" data-ta="aria-label:notation">
           <button type="button" data-view="jp" data-t="vJp">简谱</button><button type="button" data-view="staff" data-t="vStaff">Staff</button><button type="button" data-view="both" data-t="vBoth">Both</button>
         </div>
+        <label class="ctl" for="speed"><span data-t="speed">Speed</span> <input id="speed" type="range" min="40" max="120" step="5" value="100"> <span id="speedv">100%</span></label>
+        <button class="ghost" id="loopBtn" type="button" aria-pressed="false">Loop</button>
         <div class="seg" id="inSeg" role="group" data-ta="aria-label:whatPlay">
           <button type="button" data-in="screen" data-t="onScreen">On-screen recorder</button><button type="button" data-in="real" data-t="myReal">My real recorder</button>
         </div>
       </div>
       <div class="staffwrap" id="staffwrap"><svg id="staff" data-ta="aria-label:staffAria"></svg></div>
       <div class="notes" id="notes"></div>
-      <div class="row">
-        <button class="btn" id="listen" type="button" data-t="listen">Listen</button>
-        <button class="btn" id="practice" type="button" data-t="practice">Practice</button>
-        <button class="btn" id="along" type="button" data-t="along">Play along</button>
-        <button class="btn alt" id="loopBtn" type="button" aria-pressed="false">Loop</button>
-        <button class="btn alt" id="stop" type="button" data-t="stop">Stop</button>
-        <label class="ctl" for="speed"><span data-t="speed">Speed</span> <input id="speed" type="range" min="40" max="120" step="5" value="100"> <span id="speedv">100%</span></label>
+      <div class="songact">
+        <div class="actgroup" role="group" data-ta="aria-label:songActions">
+          <button class="act" id="listen" type="button" aria-pressed="false"><span aria-hidden="true">▶</span> <span data-t="listen">Listen</span></button>
+          <button class="act" id="practice" type="button" aria-pressed="false"><span aria-hidden="true">♪</span> <span data-t="practice">Practise</span></button>
+          <button class="act" id="along" type="button" aria-pressed="false"><span aria-hidden="true">♩</span> <span data-t="along">Play along</span></button>
+        </div>
+        <button class="btn alt stopb" id="stop" type="button" disabled><span aria-hidden="true">■</span> <span data-t="stop">Stop</span></button>
       </div>
       <div class="msg" id="msg"></div>
       <div class="result" id="result" hidden></div>
@@ -513,9 +555,25 @@ body.picking{overflow:hidden}
     </div>
   </section>
 
-  <section id="settingsSec">
-    <div class="sechead"><h2 data-t="settings">Settings</h2></div>
+  <details id="settingsSec" class="setwrap">
+    <summary><h2 data-t="settings">Settings</h2><span class="tip" data-t="setTip">Recorder, fingering, sound, timing and vibration</span></summary>
     <div class="settings">
+      <fieldset>
+        <legend data-t="setRecorder">Recorder and sound</legend>
+        <label class="ctl" for="sys"><span data-t="fingering">Fingering</span>
+          <select id="sys"><option value="baroque" data-t="baroque">Baroque</option><option value="german" data-t="german">German</option></select>
+        </label>
+        <label class="ctl" for="inst"><span data-t="recorder">Recorder</span>
+          <select id="inst"><option value="soprano" data-t="soprano">Soprano (C)</option><option value="alto" data-t="alto">Alto (F)</option></select>
+        </label>
+        <label class="ctl" for="vib"><input id="vib" type="checkbox" checked> <span data-t="vibrato">Vibrato</span></label>
+      </fieldset>
+      <fieldset>
+        <legend data-t="setTiming">Timing</legend>
+        <label class="ctl" for="sync" data-ta="title:fsyncTitle"><span data-t="fsync">Finger sync</span> <input id="sync" type="range" min="-300" max="800" step="10" value="0"> <span id="syncv">0 ms</span></label>
+        <p class="tip" data-t="fsyncTitle"></p>
+        <button class="ghost" id="calib" type="button" data-t="tapSync">Tap to sync</button>
+      </fieldset>
       <fieldset>
         <legend data-t="vibration">Vibration</legend>
         <label for="hapHole"><input type="checkbox" id="hapHole"> <span data-t="hapHole">Tick</span></label>
@@ -530,7 +588,7 @@ body.picking{overflow:hidden}
         <button class="ghost" id="fitResetAll" type="button" data-t="resetHands">Reset all hand layouts</button>
       </fieldset>
     </div>
-  </section>
+  </details>
   <p class="offline" id="offline"></p>
 </div>
 
@@ -619,14 +677,14 @@ const STR={
  chartTip:['Press and hold a note to hear it. Filled dot = covered, half dot = half-hole. Top dot is the thumb.','按住一个音即可试听。实心点＝按住，半实心＝半孔。最上面的点是拇指孔。','Tekan dan tahan not untuk mendengarnya. Titik penuh = ditutup, separuh titik = separuh lubang. Titik paling atas ialah ibu jari.'],
  holdPlay:['{n}, hold to play','{n}，按住试听','{n}, tahan untuk main'],
  songbook:['Songbook','练习曲','Buku lagu'],
- songTip:['Listen first, then press Practice. The orange rings on the recorder show the fingering for the next note.','先听示范，再按“练习”。竖笛上的橙色圈表示下一个音的指法。','Dengar dahulu, kemudian tekan Latihan. Gelang jingga pada rekorder menunjukkan penjarian not seterusnya.'],
+ songTip:['Listen first, then press Practise. The orange rings on the recorder show the fingering for the next note.','先听示范，再按“练习”。竖笛上的橙色圈表示下一个音的指法。','Dengar dahulu, kemudian tekan Latihan. Gelang jingga pada rekorder menunjukkan penjarian not seterusnya.'],
  notation:['Notation','记谱方式','Notasi'], vJp:['Jianpu','简谱','Jianpu'], vStaff:['Staff','五线谱','Not balok'], vBoth:['Both','两者','Kedua-dua'],
  whatPlay:['What you play','用什么演奏','Apa yang anda mainkan'], onScreen:['On-screen recorder','屏幕竖笛','Rekorder pada skrin'], myReal:['My real recorder','我的真竖笛','Rekorder sebenar saya'],
  staffAria:['Staff notation','五线谱','Notasi not balok'],
- listen:['Listen','示范','Dengar'], practice:['Practice','练习','Latihan'], along:['Play along','跟拍演奏','Main bersama'],
+ listen:['Listen','示范','Dengar'], practice:['Practise','练习','Latihan'], along:['Play along','跟拍演奏','Main bersama'],
  loop:['Loop','循环','Ulang'], loopOn:['Loop on','循环中','Ulangan aktif'], cancelLoop:['Cancel loop','取消循环','Batal ulangan'], speed:['Speed','速度','Kelajuan'],
- msgPick:['Pick a song, then press Listen, Practice or Play along.','选一首歌，然后按“示范”、“练习”或“跟拍演奏”。','Pilih lagu, kemudian tekan Dengar, Latihan atau Main bersama.'],
- msgPress:['Press Listen, Practice or Play along.','按“示范”、“练习”或“跟拍演奏”。','Tekan Dengar, Latihan atau Main bersama.'],
+ msgPick:['Pick a song, then press Listen, Practise or Play along.','选一首歌，然后按“示范”、“练习”或“跟拍演奏”。','Pilih lagu, kemudian tekan Dengar, Latihan atau Main bersama.'],
+ msgPress:['Press Listen, Practise or Play along.','按“示范”、“练习”或“跟拍演奏”。','Tekan Dengar, Latihan atau Main bersama.'],
  addSong:['Add your own song','添加自己的歌','Tambah lagu anda sendiri'],
  sName:['Name','歌名','Nama'], mySong:['My song','我的歌','Lagu saya'], sKey:['Key','调','Kunci'], sTempo:['Tempo','速度','Tempo'], sBpb:['Beats per bar','每小节拍数','Ketukan setiap bar'], sPick:['Pickup beats','弱起拍数','Ketukan anakrusis'],
  sNotes:['Notes in jianpu (简谱)','简谱音符','Not dalam jianpu (简谱)'],
@@ -675,6 +733,12 @@ const STR={
  fit:['Fit to hand','按手定位','Ikut tangan'], stdLayout:['Standard layout','标准布局','Susun atur standard'],
  hint:['Tap empty space to tongue a repeated note.','点空白处吐音（重复同一个音）。','Ketik ruang kosong untuk menyebut semula not yang berulang.'],
  next:['Next: {n}.','下一个：{n}。','Seterusnya: {n}.'], more:['More','更多','Lagi'],
+ gNext:['Next','下一个','Seterusnya'], gCover:['Cover','按住','Tutup'], gLift:['Lift','松开','Angkat'],
+ gGood:['Fingering is right. Now blow.','指法正确，现在吹。','Penjarian betul. Sekarang tiup.'],
+ gGoodReal:['That is the note. Keep going.','就是这个音，继续。','Itulah notnya. Teruskan.'],
+ songActions:['Song actions','歌曲操作','Tindakan lagu'], stopTip:['Nothing is playing','没有在播放','Tiada yang dimainkan'],
+ setTip:['Recorder, fingering, sound, timing and vibration','竖笛、指法、声音、同步和振动','Rekorder, penjarian, bunyi, masa dan getaran'],
+ setRecorder:['Recorder and sound','竖笛与声音','Rekorder dan bunyi'], setTiming:['Timing','同步','Masa'],
  moreAir:['more air','多点气','lebih udara'], lessAir:['less air','少点气','kurang udara'], goodB:['good','刚好','baik'], squeakS:['squeak!','破音！','cicit!'],
  fmFlat:['Lay the phone flat and play with your fingers in a row. Sound plays while any finger is down.','把手机平放，手指排成一排演奏。只要有手指按着就会发声。','Letakkan telefon rata dan main dengan jari dalam satu barisan. Bunyi keluar selagi ada jari menyentuh.'],
  fmUp:['Hold the phone upright like a recorder: left hand on 1–3, right hand on 4–7. Sound plays while any finger is down. Turn sideways to play flat on a table.','像竖笛一样竖着拿手机：左手按 1–3，右手按 4–7。只要有手指按着就会发声。横过来可以平放在桌上演奏。','Pegang telefon tegak seperti rekorder: tangan kiri pada 1–3, tangan kanan pada 4–7. Bunyi keluar selagi ada jari menyentuh. Pusingkan ke sisi untuk bermain rata di atas meja.'],
@@ -694,7 +758,7 @@ const STR={
  calFew:['Not enough taps were caught. Press Tap to sync and tap along with every click.','点击次数不够。请再按“点击同步”，跟着每一声点。','Tidak cukup ketikan dikesan. Tekan Ketik untuk selaras dan ketik mengikut setiap klik.'],
  calDone:['Synced. Your sound arrives about {ms} ms after the app plays it, so the fingers now wait for it. Try Listen.','已同步。你听到的声音比应用播放晚约 {ms} 毫秒，手指现在会等声音。试试“示范”。','Diselaraskan. Bunyi anda tiba kira-kira {ms} ms selepas aplikasi memainkannya, jadi jari kini menunggunya. Cuba Dengar.'],
  listening:['Listening to {s}…','正在播放 {s}…','Mendengar {s}…'], loopTag:[' (loop)','（循环）',' (ulangan)'],
- yourTurn:['Your turn: press Practice or Play along.','轮到你了：按“练习”或“跟拍演奏”。','Giliran anda: tekan Latihan atau Main bersama.'],
+ yourTurn:['Your turn: press Practise or Play along.','轮到你了：按“练习”或“跟拍演奏”。','Giliran anda: tekan Latihan atau Main bersama.'],
  prReal:['Play each note on your recorder. First: {n}','在竖笛上吹每个音。第一个：{n}','Mainkan setiap not pada rekorder anda. Pertama: {n}'],
  prScreen:['Match the orange rings, then blow. Use a fresh breath for repeated notes. First: {n}','按橙色圈的指法，然后吹。重复的音要重新吐一次气。第一个：{n}','Ikut gelang jingga, kemudian tiup. Guna nafas baharu untuk not berulang. Pertama: {n}'],
  nextN:['Next: {n}  ({i}/{t})','下一个：{n}（{i}/{t}）','Seterusnya: {n}  ({i}/{t})'],
@@ -703,9 +767,9 @@ const STR={
  alongReal:['Play along on your recorder…','用你的竖笛跟着吹…','Main bersama dengan rekorder anda…'], alongScreen:['Play along…','跟着演奏…','Main bersama…'],
  loopFirst:['Tap the first note of the section you want to repeat.','点要重复的段落的第一个音。','Ketik not pertama bahagian yang anda mahu ulang.'],
  loopLast:['Now tap the last note of the section.','再点这一段的最后一个音。','Sekarang ketik not terakhir bahagian itu.'],
- loopSet:['Looping notes {a}–{b}. Listen repeats it; Practice and Play along use just this part.','循环第 {a}–{b} 个音。“示范”会重复播放；“练习”和“跟拍演奏”只用这一段。','Mengulang not {a}–{b}. Dengar akan mengulanginya; Latihan dan Main bersama hanya guna bahagian ini.'],
+ loopSet:['Looping notes {a}–{b}. Listen repeats it; Practise and Play along use just this part.','循环第 {a}–{b} 个音。“示范”会重复播放；“练习”和“跟拍演奏”只用这一段。','Mengulang not {a}–{b}. Dengar akan mengulanginya; Latihan dan Main bersama hanya guna bahagian ini.'],
  loopOff:['Loop off: the whole song plays.','循环关闭：播放整首歌。','Ulangan dimatikan: seluruh lagu dimainkan.'],
- inReal:['Play your own recorder near the phone. Practice and Play along will listen to it.','在手机旁吹你自己的竖笛。“练习”和“跟拍演奏”会听它。','Mainkan rekorder anda berhampiran telefon. Latihan dan Main bersama akan mendengarnya.'],
+ inReal:['Play your own recorder near the phone. Practise and Play along will listen to it.','在手机旁吹你自己的竖笛。“练习”和“跟拍演奏”会听它。','Mainkan rekorder anda berhampiran telefon. Latihan dan Main bersama akan mendengarnya.'],
  inScreen:['Play the on-screen recorder.','演奏屏幕上的竖笛。','Mainkan rekorder pada skrin.'],
  rest:['rest','休止','rehat'], notesN:['{n} notes','{n} 个音','{n} not'], best:['Best ★{n}%','最佳 ★{n}%','Terbaik ★{n}%'],
  cantPlay:["This song has {n} note(s) the {r} recorder can't play: {x}. Switch recorder, or change the song's key.",'这首歌有 {n} 个音是{r}竖笛吹不出的：{x}。请换一支竖笛，或改变歌曲的调。','Lagu ini ada {n} not yang tidak boleh dimainkan oleh rekorder {r}: {x}. Tukar rekorder, atau ubah kunci lagu.'],
@@ -899,6 +963,7 @@ function drawRecorder(){
       el('circle',{cx:x,cy:y,r:11.5,class:'pad pad-full'},grp);
       el('path',{d:`M${x} ${y-11.5} A11.5 11.5 0 0 0 ${x} ${y+11.5} Z`,class:'pad pad-half'},grp);
     }
+    el('text',{x:h.thumb?x-20:CX-44,y:y+6,class:'cue'},grp);
     const t=el('text',{x:h.thumb?x:CX+46,y:h.thumb?y-18:y+4,'text-anchor':'middle',class:'lbl'});
     t.textContent=h.thumb?'T':`${i}`;
     if(!h.thumb){const t2=el('text',{x:CX+46,y:y+16,'text-anchor':'middle',class:'lbl'});t2.textContent=h.lab;t2.style.opacity='.7'}
@@ -981,6 +1046,7 @@ function render(){
     g.classList.remove('want','ok','lift');
   });
   const tgt=target();
+  renderGuide(tgt);
   if(tgt!=null&&table()[tgt]){
     const f=table()[tgt]?[...table()[tgt]].map(dec):null;
     document.querySelectorAll('.hole').forEach(g=>{const i=+g.dataset.i;
@@ -990,6 +1056,26 @@ function render(){
   }
   renderFM(n,tgt);
   document.querySelectorAll('.cn').forEach(b=>{const bm=+b.dataset.m; b.classList.toggle('cur',bm===m&&!n.approx); b.classList.toggle('tgt',bm===tgt)});
+}
+// "Next: G" card and the cover / lift symbols beside each hole
+function renderGuide(tgt){
+  const g=$('guide'), f=tgt!=null&&table()[tgt]?[...table()[tgt]].map(dec):null;
+  g.hidden=!f;
+  document.querySelectorAll('.hole').forEach(h=>{
+    const i=+h.dataset.i, c=h.querySelector('.cue'); if(!c) return;
+    let sym='', cls='';
+    if(f){ if(f[i]&&f[i]===holes[i]){sym='✓';cls='ok'} else if(f[i]){sym=f[i]===2?'◐':'●';cls='cover'} else if(holes[i]){sym='↑';cls='lift'} }
+    c.textContent=sym; c.setAttribute('class','cue '+cls);
+  });
+  if(!f) return;
+  $('gNote').textContent=label(tgt); $('gJp').innerHTML=jianpu(tgt,song.tonic); $('gMini').innerHTML=mini(table()[tgt]);
+  const nm=i=>i?String(i):'T', done=f.every((v,i)=>v===holes[i]);
+  const cover=f.map((v,i)=>v&&v!==holes[i]?nm(i)+(v===2?'½':''):null).filter(Boolean), lift=f.map((v,i)=>!v&&holes[i]?nm(i):null).filter(Boolean);
+  g.classList.toggle('ok',done);
+  const t=$('gTxt'); t.textContent='';
+  if(done){ t.textContent='✓ '+TR(inputSrc==='real'?'gGoodReal':'gGood'); return }
+  const part=(sym,key,list,cls)=>{ if(!list.length) return; const sp=document.createElement('span'); sp.className=cls; sp.textContent=`${sym} ${TR(key)}: ${list.join(' ')}`; if(t.childNodes.length) t.append('   '); t.append(sp) };
+  part('●','gCover',cover,'cv'); part('↑','gLift',lift,'lf');
 }
 function mini(f){
   const s=[`<svg class="mini" width="22" height="70" viewBox="0 0 22 70" aria-hidden="true">`];
@@ -1235,7 +1321,12 @@ function drawStaff(){
   sv.setAttribute('width',x+6); sv.setAttribute('height',y0+90); sv.setAttribute('viewBox',`0 0 ${x+6} ${y0+90}`);
   sv.querySelectorAll('.sn').forEach(g=>g.addEventListener('click',()=>chipClick(+g.dataset.k)));
 }
+function updateSongButtons(){
+  [['listen','demo'],['practice','practice'],['along','along']].forEach(([id,m])=>$(id).setAttribute('aria-pressed',mode===m));
+  const idle=!mode&&loopPick==null; $('stop').disabled=idle; $('stop').title=idle?TR('stopTip'):'';
+}
 function markChips(active){
+  updateSongButtons();
   const [a,b]=segRange(), pk=P.list[P.i]?P.list[P.i].k:-1;
   document.querySelectorAll('.chip,.sn').forEach(c=>{const k=+c.dataset.k;
     c.classList.toggle('done',mode==='practice'&&k>=a&&k<pk);
@@ -1572,6 +1663,8 @@ function renderFM(n,tgt){
     d.classList.remove('want','ok','lift');
     if(f&&!tab){ if(f[i]){d.classList.add('want'); if(f[i]===holes[i]) d.classList.add('ok')} else if(holes[i]) d.classList.add('lift') }
     if(f&&tab&&f[i]===2){d.classList.add('want'); if(holes[i]===2) d.classList.add('ok')}
+    let cue=''; if(f&&!tab){ if(f[i]&&f[i]===holes[i]) cue='✓'; else if(f[i]) cue=f[i]===2?'◐':'●'; else if(holes[i]) cue='↑' }
+    if(cue) d.dataset.cue=cue; else delete d.dataset.cue;
   });
 }
 function fmText(t){ $('fmMsg').textContent=t }
@@ -1636,6 +1729,7 @@ function closeFM(){
 }
 $('fmOpen').addEventListener('click',openFM);
 $('fmExit').addEventListener('click',closeFM);
+$('setBtn').addEventListener('click',()=>{ const d=$('settingsSec'); d.open=true; d.scrollIntoView({behavior:'smooth',block:'start'}) });
 $('fmMore').addEventListener('click',()=>{ const open=$('fmPanel').hidden; $('fmPanel').hidden=!open; $('fmMore').setAttribute('aria-expanded',open) });
 // Re-measure the holes whenever the playing area changes size (messages wrapping, panels opening, rotation).
 if(window.ResizeObserver) new ResizeObserver(()=>{ if(!fm.hidden) layoutFM() }).observe(field);
@@ -1791,7 +1885,9 @@ function tunerFrame(){
   T.an.getFloatTimeDomainData(T.buf);
   const r=yin(T.buf,A.ctx.sampleRate);
   const ok=r.f&&r.clarity>0.82&&r.rms>0.01;
-  if(!ok){ if(++T.quiet>=4&&T.note!=null){ T.note=null; $('tStatus').textContent=TR('tListen2') } return }
+  if(!ok){
+    if(T.note!=null&&(r.rms||0)<T.noteRms*0.4) T.dipped=true;    // a silent gap (a clean "tu") counts as a dip too
+    if(++T.quiet>=4&&T.note!=null){ T.note=null; $('tStatus').textContent=TR('tListen2') } return }
   T.quiet=0;
   const mf=69+12*Math.log2(r.f/440), n=Math.round(mf), cents=(mf-n)*100;
   if(n<LO-3||n>HI+3) return;
