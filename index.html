@@ -53,7 +53,9 @@ button,select,input{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
 /* stage */
-.stage{display:grid;grid-template-columns:auto minmax(0,1fr);gap:28px;align-items:start}
+.stage{display:grid;grid-template-columns:auto minmax(0,1fr);gap:18px 28px;align-items:start}
+.instrument{grid-row:span 2}
+.console-extra{grid-column:2;display:flex;flex-direction:column;gap:18px;min-width:0}
 .instrument{display:flex;flex-direction:column;align-items:center;gap:6px}
 #rec{height:min(76vh,680px);width:auto;display:block;touch-action:manipulation;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
 .instrument .cap{font-size:12px;color:var(--muted);text-align:center;max-width:150px;line-height:1.35}
@@ -334,6 +336,9 @@ body.picking{overflow:hidden}
 .toast[hidden]{display:none}
 .offline{font-size:12px;color:var(--muted);margin:0}
 @media (max-width:640px){
+  .instrument{grid-row:auto}
+  .console-extra{grid-column:1/-1}
+  .mhead .mtog{margin-left:auto}
   .controls{display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:center}
   .controls .ctl{grid-column:1/-1;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:center}
   .controls .ctl > span:first-child{white-space:nowrap}
@@ -406,7 +411,9 @@ body.picking{overflow:hidden}
         <button class="ghost" id="openAll" type="button" data-t="openAll">Open all</button>
         <button class="ghost" id="closeAll" type="button" data-t="coverAll">Cover all</button>
       </div>
+    </div>
 
+    <div class="console-extra">
       <div class="metro" id="metro">
         <div class="mhead">
           <h3 data-t="metro">Metronome</h3>
