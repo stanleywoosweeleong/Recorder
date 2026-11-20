@@ -246,7 +246,9 @@ section{display:flex;flex-direction:column;gap:14px}
 .chip.j-miss{opacity:.45}.chip.j-miss .d{text-decoration:line-through}
 .sn.j-miss{opacity:.4}
 .chip.j-early::after,.chip.j-late::after{font-size:9px;color:var(--guide);line-height:1}
-.chip.j-early::after,.chip.j-late::after{content:attr(data-jl)}
+.chip[data-jl]::after{content:attr(data-jl);font-size:11px;font-weight:700;line-height:1}
+.chip.j-perfect::after,.chip.j-good::after{color:var(--accent)}.chip.j-wrong::after{color:var(--bad)}.chip.j-miss::after{color:var(--muted)}
+.chip.done:not([data-jl])::after{content:"✓";font-size:11px;color:var(--accent);line-height:1}
 @keyframes nope{0%,100%{transform:none}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
 .nope{animation:nope .2s 2}
 .staffwrap{overflow-x:auto;background:var(--bg);border-radius:10px;border:1px solid var(--line);padding:4px 0}
@@ -363,6 +365,40 @@ body.picking{overflow:hidden}
 .settings .ctl{display:flex;align-items:center;gap:10px;justify-content:space-between;flex-wrap:wrap}
 .settings .ctl input[type=range]{flex:1;min-width:120px}
 .tip{color:color-mix(in srgb,var(--muted) 85%,var(--ink))}
+/* start actions */
+.starts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.start{display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;column-gap:10px;align-items:center;text-align:left;
+  background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;cursor:pointer;color:var(--ink);min-height:64px}
+.start:hover{border-color:var(--accent)}
+.start .sic{grid-row:span 2;font-size:26px;color:var(--accent);width:1.2em;text-align:center}
+.start b{font-family:var(--f-display);font-size:16px}
+.start small{color:var(--muted);font-size:13px}
+.starthint{display:flex;gap:10px;align-items:center;background:color-mix(in srgb,var(--accent) 12%,var(--surface));border:1px solid var(--accent);border-radius:12px;padding:10px 12px;font-size:15px}
+.starthint span{flex:1}
+/* microphone state */
+.pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 12px;font-size:13px;font-weight:600;border:1px solid var(--line);color:var(--muted);width:fit-content}
+.pill.on{color:var(--accent);border-color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,transparent)}
+.pill.paused{color:var(--guide);border-color:var(--guide);background:color-mix(in srgb,var(--guide) 12%,transparent)}
+.msgact{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:14px}
+.act:disabled{opacity:.4;cursor:not-allowed}
+.settings label.na{opacity:.5}
+/* phone dock */
+.dock{position:fixed;left:0;right:0;bottom:0;z-index:40;display:flex;gap:10px;align-items:center;background:var(--surface);border-top:1px solid var(--line);
+  padding:10px max(16px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));box-shadow:0 -6px 18px rgba(0,0,0,.12)}
+.dinfo{display:flex;flex-direction:column;min-width:64px}
+.dinfo span{font-size:12px;color:var(--muted)}
+.dinfo b{font-family:var(--f-display);font-size:28px;line-height:1}
+.dstop{min-height:52px}
+.dblow{flex:1;min-height:56px;border:0;border-radius:14px;background:var(--accent);color:var(--accent-ink);font:800 20px var(--f-display);touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+body.docked{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
+.fm-song .fm-ic{width:44px;min-height:40px;font-size:16px;padding:0}
+.fm-song select{flex:1;min-width:0;max-width:none}
+/* accessibility: bigger targets on touch screens, clear focus, readable small text */
+@media (pointer:coarse){ button,select,.tab,summary{min-height:44px} .chip{min-width:40px} .mstep{width:44px;height:44px} .fm-x.ico{width:44px;height:44px} }
+.actgroup .act:focus-visible{outline:3px solid var(--accent);outline-offset:-5px}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.fact > span,.tfacts > div > span,.tscale{font-size:12px}
+.chip .l{font-size:11px}
 .toast{position:fixed;left:0;right:0;bottom:0;z-index:60;display:flex;align-items:center;gap:10px;
   padding:12px max(16px,env(safe-area-inset-right,0px)) calc(12px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));
   background:var(--ink);color:var(--bg);font-size:14px}
@@ -372,6 +408,8 @@ body.picking{overflow:hidden}
 .toast[hidden]{display:none}
 .offline{font-size:12px;color:var(--muted);margin:0}
 @media (max-width:640px){
+  .starts{grid-template-columns:1fr}
+  .start{min-height:56px;padding:10px 12px}
   .guide{padding:10px 12px;gap:10px}
   .ghead b{font-size:34px}
   .act{font-size:14px;padding:8px 6px}
@@ -415,6 +453,13 @@ body.picking{overflow:hidden}
     <h1 data-t="appName">Soprano Recorder</h1>
     <p class="lede" data-th="lede">Tap the holes to cover them, then hold <b>Blow</b> to play.</p>
   </header>
+
+  <nav class="starts" data-ta="aria-label:startAria">
+    <button type="button" class="start" data-go="play"><span class="sic" aria-hidden="true">♪</span><b data-t="startPlay">Play the recorder</b><small data-t="startPlayD">Cover holes and blow</small></button>
+    <button type="button" class="start" data-go="song"><span class="sic" aria-hidden="true">♫</span><b data-t="startSong">Practise a song</b><small data-t="startSongD">Listen, then play along</small></button>
+    <button type="button" class="start" data-go="real"><span class="sic" aria-hidden="true">◎</span><b data-t="startReal">Use my real recorder</b><small data-t="startRealD">The app listens through the mic</small></button>
+  </nav>
+  <div class="starthint" id="startHint" hidden role="status"><span id="startHintTxt"></span><button type="button" class="ghost" id="startHintX" data-ta="aria-label:close">✕</button></div>
 
   <div class="stage">
     <div class="instrument">
@@ -515,7 +560,9 @@ body.picking{overflow:hidden}
         </div>
         <button class="btn alt stopb" id="stop" type="button" disabled><span aria-hidden="true">■</span> <span data-t="stop">Stop</span></button>
       </div>
-      <div class="msg" id="msg"></div>
+      <div class="pill off" id="songMic" hidden></div>
+      <div class="msg" id="msg" role="status"></div>
+      <div class="msgact" id="msgAct" hidden></div>
       <div class="result" id="result" hidden></div>
       <details class="addsong">
         <summary data-t="addSong">Add your own song</summary>
@@ -536,7 +583,7 @@ body.picking{overflow:hidden}
   <section id="realSec">
     <div class="sechead"><h2 data-t="real">Real recorder</h2><span class="tip" data-t="realTip">Play your own recorder near the phone.</span></div>
     <div class="tuner">
-      <div class="row"><button class="btn" id="tunerBtn" type="button" aria-pressed="false" >Start listening</button><span class="tip" id="tStatus"></span></div>
+      <div class="row"><button class="btn" id="tunerBtn" type="button" aria-pressed="false">Start listening</button><span class="pill off" id="tPill"></span><span class="tip" id="tStatus"></span></div>
       <div class="tmain">
         <div class="tnote"><b id="tNote">–</b><span id="tJp"></span></div>
         <div class="tgauge">
@@ -607,13 +654,14 @@ body.picking{overflow:hidden}
     <span data-t="breath">Breath</span> <span class="meter" id="meter"><i></i></span><span id="breathTxt">–</span>
     <label for="sens"><span data-t="sensitivity">Sensitivity</span> <input id="sens" type="range" min="1" max="100" value="55"></label>
   </div>
+  <div class="fm-row fm-song">
+    <select id="fmSong" data-ta="aria-label:song"></select>
+    <button type="button" class="fm-ic" id="fmListen" data-ta="aria-label:listen;title:listen">▶</button>
+    <button type="button" class="fm-ic" id="fmPractice" data-ta="aria-label:practice;title:practice">♪</button>
+    <button type="button" class="fm-ic" id="fmAlong" data-ta="aria-label:along;title:along">♩</button>
+    <button type="button" class="fm-ic" id="fmStop" data-ta="aria-label:stop;title:stop">■</button>
+  </div>
   <div class="fm-more" id="fmPanel" hidden>
-    <div class="fm-row">
-      <select id="fmSong" data-ta="aria-label:song"></select>
-      <button type="button" id="fmListen" data-t="listen">Listen</button>
-      <button type="button" id="fmPractice" data-t="practice">Practice</button>
-      <button type="button" id="fmAlong" data-t="along">Play along</button>
-    </div>
     <div class="fm-row">
       <span class="fm-metro"><button type="button" id="fmMetro" aria-pressed="false">♩ <span id="fmBpm">96</span></button><span class="mdots" id="fmDots" aria-hidden="true"></span></span>
       <label for="sync2"><span data-t="sync">Sync</span> <input id="sync2" type="range" min="-300" max="800" step="10" value="0"> <span id="syncv2">0 ms</span></label>
@@ -630,6 +678,12 @@ body.picking{overflow:hidden}
     <div class="fm-hint" id="fmHint" data-t="hint">Tap empty space to tongue a repeated note.</div>
   </div>
 </div></div>
+
+<div class="dock" id="dock" hidden>
+  <div class="dinfo"><span id="dLab">Blow</span><b id="dNote">–</b></div>
+  <button type="button" class="ghost dstop" id="dStop" hidden data-ta="aria-label:stop">■ <span data-t="stop">Stop</span></button>
+  <button type="button" class="dblow" id="dBlow" data-ta="aria-label:blowAria"><span data-t="blow">Blow</span></button>
+</div>
 
 <div id="langpick" role="dialog" aria-modal="true" tabindex="-1" aria-label="中文 · English · Bahasa Melayu" hidden>
   <svg viewBox="0 0 120 120" width="88" height="88" aria-hidden="true"><rect width="120" height="120" rx="26" fill="#1B7461"/><g transform="rotate(-24 60 60)"><path d="M54 10 Q60 6 66 10 L70 26 L69 104 Q72 110 71 112 L49 112 Q48 110 51 104 L50 26 Z" fill="#E3C38A"/><rect x="50" y="36" width="20" height="4" fill="#7A5323"/><rect x="56" y="22" width="8" height="6" fill="#2A1909"/><g fill="#2A1909"><circle cx="60" cy="50" r="3"/><circle cx="60" cy="60" r="3"/><circle cx="60" cy="70" r="3"/><circle cx="60" cy="82" r="3"/><circle cx="60" cy="92" r="3"/></g></g></svg>
@@ -733,7 +787,21 @@ const STR={
  fit:['Fit to hand','按手定位','Ikut tangan'], stdLayout:['Standard layout','标准布局','Susun atur standard'],
  hint:['Tap empty space to tongue a repeated note.','点空白处吐音（重复同一个音）。','Ketik ruang kosong untuk menyebut semula not yang berulang.'],
  next:['Next: {n}.','下一个：{n}。','Seterusnya: {n}.'], more:['More','更多','Lagi'],
- gNext:['Next','下一个','Seterusnya'], gCover:['Cover','按住','Tutup'], gLift:['Lift','松开','Angkat'],
+ gNext:['Next','下一个','Seterusnya'],
+ startAria:['Where to start','从哪里开始','Mula di mana'], close:['Close','关闭','Tutup'],
+ startPlay:['Play the recorder','吹竖笛','Main rekorder'], startPlayD:['Cover holes and blow','按孔吹奏','Tutup lubang dan tiup'],
+ startSong:['Practise a song','练一首歌','Berlatih lagu'], startSongD:['Listen, then play along','先听，再跟着吹','Dengar, kemudian main bersama'],
+ startReal:['Use my real recorder','用我的真竖笛','Guna rekorder sebenar saya'], startRealD:['The app listens through the mic','应用通过麦克风聆听','Aplikasi mendengar melalui mikrofon'],
+ hintPlay:['Tap the holes on the recorder to cover them, then hold Blow. On a phone, Finger mode lets you use all your fingers.','点击竖笛上的音孔把它按住，然后按住“吹奏”。在手机上，“手指模式”可以用所有手指演奏。','Ketik lubang pada rekorder untuk menutupnya, kemudian tahan Tiup. Pada telefon, Mod jari membolehkan anda menggunakan semua jari.'],
+ hintSong:['Pick a song, press Listen to hear it, then Practise. The Next card shows each fingering.','选一首歌，按“示范”听一遍，然后按“练习”。“下一个”卡片会显示每个指法。','Pilih lagu, tekan Dengar untuk mendengarnya, kemudian Latihan. Kad Seterusnya menunjukkan setiap penjarian.'],
+ hintReal:['Hold your recorder near the phone and play a long G (thumb and holes 1–3). Then pick a song and press Practise.','把竖笛靠近手机，吹一个长音 G（拇指和 1–3 孔）。然后选一首歌，按“练习”。','Pegang rekorder anda dekat telefon dan mainkan not G yang panjang (ibu jari dan lubang 1–3). Kemudian pilih lagu dan tekan Latihan.'],
+ micOff:['Microphone off','麦克风已关闭','Mikrofon dimatikan'], micOn:['Listening','正在聆听','Sedang mendengar'], micPaused:['Paused while the demo plays','示范播放时暂停','Dijeda semasa demo dimainkan'],
+ resumeListen:['Resume listening','继续聆听','Sambung mendengar'],
+ switchTo:['Switch to {r}','换成{r}','Tukar ke {r}'], chooseKey:['Choose another key:','选择另一个调：','Pilih kunci lain:'],
+ noFix:["No key fits this recorder. Edit the song's notes.",'没有适合这支竖笛的调。请修改歌曲的音。','Tiada kunci yang sesuai untuk rekorder ini. Sunting not lagu.'],
+ keyChanged:['Key changed to {k}.','已改为 {k}。','Kunci ditukar kepada {k}.'],
+ cantShort:["This recorder can't play every note in this song.",'这支竖笛吹不出这首歌的所有音。','Rekorder ini tidak boleh memainkan semua not dalam lagu ini.'],
+ hapNA:['Not available on this device','此设备不支持','Tidak tersedia pada peranti ini'], gCover:['Cover','按住','Tutup'], gLift:['Lift','松开','Angkat'],
  gGood:['Fingering is right. Now blow.','指法正确，现在吹。','Penjarian betul. Sekarang tiup.'],
  gGoodReal:['That is the note. Keep going.','就是这个音，继续。','Itulah notnya. Teruskan.'],
  songActions:['Song actions','歌曲操作','Tindakan lagu'], stopTip:['Nothing is playing','没有在播放','Tiada yang dimainkan'],
@@ -1046,7 +1114,7 @@ function render(){
     g.classList.remove('want','ok','lift');
   });
   const tgt=target();
-  renderGuide(tgt);
+  renderGuide(tgt); if(typeof renderDock==='function') renderDock();
   if(tgt!=null&&table()[tgt]){
     const f=table()[tgt]?[...table()[tgt]].map(dec):null;
     document.querySelectorAll('.hole').forEach(g=>{const i=+g.dataset.i;
@@ -1257,7 +1325,7 @@ function buildSong(){
     c.addEventListener('click',()=>chipClick(+c.dataset.k));
     box.appendChild(c);
   });
-  drawStaff(); applyView(); markChips();
+  drawStaff(); applyView(); markChips(); rangeActions(); if(unplayable().length&&!mode) blockedByRange();
 }
 function applyView(){
   $('notes').hidden=view==='staff'; $('staffwrap').hidden=view==='jp';
@@ -1266,7 +1334,7 @@ function applyView(){
 }
 document.querySelectorAll('#viewSeg button').forEach(b=>b.addEventListener('click',()=>{view=b.dataset.view;saveView();applyView();markChips()}));
 document.querySelectorAll('#inSeg button').forEach(b=>b.addEventListener('click',()=>{
-  inputSrc=b.dataset.in; saveView(); applyView();
+  setInput(b.dataset.in);
   if(inputSrc==='real') setMsg(TR('inReal')); else { setMsg(TR('inScreen')); if(typeof tunerStop==='function'&&tuner&&tuner.forSong) tunerStop() }
 }));
 
@@ -1322,7 +1390,9 @@ function drawStaff(){
   sv.querySelectorAll('.sn').forEach(g=>g.addEventListener('click',()=>chipClick(+g.dataset.k)));
 }
 function updateSongButtons(){
-  [['listen','demo'],['practice','practice'],['along','along']].forEach(([id,m])=>$(id).setAttribute('aria-pressed',mode===m));
+  const bad=unplayable().length>0;
+  [['listen','demo'],['practice','practice'],['along','along']].forEach(([id,m])=>{ const b=$(id); b.setAttribute('aria-pressed',mode===m); b.disabled=bad&&!mode; b.title=b.disabled?TR('cantShort'):'' });
+  ['fmListen','fmPractice','fmAlong'].forEach(id=>{ $(id).disabled=bad&&!mode });
   const idle=!mode&&loopPick==null; $('stop').disabled=idle; $('stop').title=idle?TR('stopTip'):'';
 }
 function markChips(active){
@@ -1334,7 +1404,8 @@ function markChips(active){
     c.classList.toggle('inloop',!!loopSel&&k>=a&&k<=b);
     c.classList.toggle('pick',loopPick!=null&&k===loopPick);
     ['perfect','good','early','late','miss','wrong'].forEach(r=>c.classList.toggle('j-'+r,!!(J&&J.byK[k]&&J.byK[k].res===r)));
-    const jr=J&&J.byK[k]&&J.byK[k].res; if(jr==='early'||jr==='late') c.dataset.jl=TR(jr==='early'?'jEarly':'jLate');
+    const jr=J&&J.byK[k]&&J.byK[k].res, sym={perfect:'✓',good:'✓',wrong:'✗',miss:'–'}[jr];
+    if(jr==='early'||jr==='late') c.dataset.jl=TR(jr==='early'?'jEarly':'jLate'); else if(sym) c.dataset.jl=sym; else delete c.dataset.jl;
   });
   const now=document.querySelector('.sn.now');
   if(now&&!$('staffwrap').hidden){ const w=$('staffwrap'), bx=now.getBBox?now.getBBox().x:0; if(bx<w.scrollLeft+40||bx>w.scrollLeft+w.clientWidth-80) w.scrollLeft=Math.max(0,bx-w.clientWidth/3) }
@@ -1866,18 +1937,18 @@ async function tunerStart(forSong){
   const an=A.ctx.createAnalyser(); an.fftSize=2048; src.connect(hp); hp.connect(an);
   tuner={stream,an,buf:new Float32Array(2048),raf:0,forSong:!!forSong,paused:false,cand:null,candN:0,note:null,quiet:0,
     noteRms:0,dipped:false,startAt:0,attack:null,cents:[],count:0};
-  $('tunerBtn').textContent=TR('stopListen'); $('tunerBtn').setAttribute('aria-pressed','true');
+  renderMic();
   $('tStatus').textContent=TR('tListen1');
   const loop=()=>{ if(!tuner) return; tunerFrame(); tuner.raf=requestAnimationFrame(loop) };
   loop(); return true;
 }
 function tunerStop(){
   if(!tuner) return; cancelAnimationFrame(tuner.raf); tuner.stream.getTracks().forEach(t=>t.stop()); tuner=null; setSession('playback');
-  $('tunerBtn').textContent=TR('startListen'); $('tunerBtn').setAttribute('aria-pressed','false');
+  renderMic();
   $('tStatus').textContent=TR('tIdle'); $('tMsg').textContent=TR('tTip'); $('tNote').textContent='–'; $('tJp').innerHTML='';
   $('tNeedle').style.left='50%'; $('tCents').textContent='–'; $('tHz').textContent='–';
 }
-function tunerPause(on){ if(tuner){ tuner.paused=on; if(on) tuner.note=null } }
+function tunerPause(on){ if(tuner){ tuner.paused=on; if(on) tuner.note=null; renderMic() } }
 function tunerFrame(){
   const T=tuner, now=A.ctx.currentTime;
   if(T.paused||blowing()) return;                                    // don't listen to the app's own recorder sound
@@ -1920,7 +1991,7 @@ function noteStart(n,now,rms){
   if(want!=null&&n===want+12) $('tMsg').textContent=TR('squeak');
   onset(n,'real');
 }
-$('tunerBtn').addEventListener('click',()=>{ tuner?tunerStop():tunerStart(false) });
+$('tunerBtn').addEventListener('click',()=>{ if(tuner&&tuner.paused){ stopSong(); setMsg(TR('stopped')) } else if(tuner) tunerStop(); else tunerStart(false) });
 
 /* ---------- apply the chosen language; first-launch picker ---------- */
 function applyLang(){
@@ -1936,9 +2007,10 @@ function applyLang(){
   const bk=$('backLbl'); if(bk) bk.textContent=TR('back');
   $('hapStatus').textContent=TR(canVib?'hapYes':isIOS?'hapIOS':'hapNo');
   $('loopBtn').textContent=TR(loopSel?'loopOn':loopPick!=null?'cancelLoop':'loop');
-  $('tunerBtn').textContent=TR(tuner?'stopListen':'startListen');
   if(!tuner){ $('tStatus').textContent=TR('tIdle'); $('tMsg').textContent=TR('tTip') }
   $('fitResetAll').textContent=TR('resetHands');
+  if(typeof renderMic==='function'){ renderMic(); rangeActions(); markUnavailable() }
+  const sh=$('startHint'); if(!sh.hidden&&sh.dataset.k) $('startHintTxt').textContent=TR(sh.dataset.k);
   buildChart(); buildTabs(); buildSong(); mUI(); render();
   if(!mode) setMsg(TR('msgPick'));
   if(!fm.hidden) fmText(TR(fmMode==='mic'?(flipped?'fmMicOnF':'fmMicOn'):field.clientWidth>field.clientHeight*1.15?'fmFlat':'fmUp'));
@@ -1963,7 +2035,73 @@ $('langpick').addEventListener('click',e=>{
 });
 $('langSel').addEventListener('change',e=>setLang(e.target.value));
 
-drawRecorder(); applyLang();
+/* ---------- start actions, microphone state, fixable errors, phone dock ---------- */
+function startHint(key){ const h=$('startHint'); h.hidden=false; $('startHintTxt').textContent=TR(key); h.dataset.k=key }
+$('startHintX').addEventListener('click',()=>{ $('startHint').hidden=true });
+document.querySelectorAll('.start').forEach(b=>b.addEventListener('click',async()=>{
+  const go=b.dataset.go; ensure();
+  if(go==='play'){ startHint('hintPlay'); document.querySelector('.stage').scrollIntoView({behavior:'smooth',block:'start'}); setTimeout(()=>$('blow').focus({preventScroll:true}),400) }
+  if(go==='song'){ setInput('screen'); startHint('hintSong'); document.querySelector('.songbook').scrollIntoView({behavior:'smooth',block:'start'}) }
+  if(go==='real'){ setInput('real'); startHint('hintReal'); $('realSec').scrollIntoView({behavior:'smooth',block:'start'}); await tunerStart(false) }
+}));
+function setInput(v){ inputSrc=v; saveView(); applyView(); renderMic() }
+
+// One microphone state everywhere: off, listening, or paused while the demo plays.
+function micState(){ return !tuner?'off':tuner.paused?'paused':'on' }
+function renderMic(){
+  const st=micState(), txt={off:'○ '+TR('micOff'),on:'● '+TR('micOn'),paused:'❚❚ '+TR('micPaused')}[st];
+  ['tPill','songMic'].forEach(id=>{ const e=$(id); e.textContent=txt; e.className='pill '+st });
+  $('songMic').hidden=inputSrc!=='real';
+  const b=$('tunerBtn'); b.textContent=TR(st==='off'?'startListen':st==='paused'?'resumeListen':'stopListen'); b.setAttribute('aria-pressed',st!=='off');
+}
+const canMic=!!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia);
+
+// Unsupported notes: offer the fixes that actually work, and grey out what can't run.
+const KEYNAME={72:'1=C',74:'1=D',77:'1=F',79:'1=G',81:'1=A',82:'1=B♭'};
+function fitsInst(notes,which){ const off=which==='alto'?-7:0, t=mkTable(system==='baroque'?BAROQUE:GERMAN,off); return notes.every(n=>n.bar||n.rest||t[n.m]) }
+function rangeActions(){
+  const box=$('msgAct'); box.textContent=''; const bad=unplayable().length>0; box.hidden=!bad; if(!bad) return;
+  const btn=(txt,fn)=>{ const b=document.createElement('button'); b.type='button'; b.className='ghost'; b.textContent=txt; b.addEventListener('click',fn); box.appendChild(b) };
+  const other=inst==='alto'?'soprano':'alto';
+  if(fitsInst(song.notes,other)) btn(TR('switchTo',{r:TR(other)}),()=>{ $('inst').value=other; $('inst').dispatchEvent(new Event('change')) });
+  if(song.custom){
+    const keys=Object.keys(KEYNAME).map(Number).filter(k=>k!==song.tonic&&fitsInst(parseJianpu(song.src,k).notes,inst));
+    if(keys.length){ const l=document.createElement('span'); l.textContent=TR('chooseKey'); box.appendChild(l);
+      keys.forEach(k=>btn(KEYNAME[k],()=>{ song.tonic=k; song.key=KEYNAME[k]; song.notes=parseJianpu(song.src,k).notes; saveCustom(); buildSong(); setMsg(TR('keyChanged',{k:KEYNAME[k]})) })) }
+  }
+  if(!box.querySelector('button')){ const l=document.createElement('span'); l.textContent=TR('noFix'); box.appendChild(l) }
+}
+
+// Phone dock: Blow, the next note and Stop within thumb reach once the main Blow button scrolls away.
+let blowVisible=true;
+function renderDock(){
+  const d=$('dock'), phone=matchMedia('(max-width:640px)').matches;
+  const show=phone&&!blowVisible&&fm.hidden&&$('langpick').hidden;
+  d.hidden=!show; document.body.classList.toggle('docked',show);
+  if(!show) return;
+  const tgt=target(), n=cur();
+  $('dNote').textContent=tgt!=null?label(tgt):blowing()?label(n.midi):'–';
+  $('dLab').textContent=TR(tgt!=null?'gNext':'blow');
+  $('dStop').hidden=!mode;
+}
+if(window.IntersectionObserver) new IntersectionObserver(es=>{ blowVisible=es[0].isIntersecting; renderDock() }).observe($('blow'));
+window.addEventListener('resize',renderDock);
+const dBlow=$('dBlow');
+dBlow.addEventListener('pointerdown',e=>{ e.preventDefault(); try{dBlow.setPointerCapture(e.pointerId)}catch(_){} startBlow('dock') });
+['pointerup','pointercancel','lostpointercapture'].forEach(ev=>dBlow.addEventListener(ev,()=>release('dock')));
+dBlow.addEventListener('contextmenu',e=>e.preventDefault());
+$('dStop').addEventListener('click',()=>$('stop').click());
+$('fmStop').addEventListener('click',()=>$('stop').click());
+
+// Things this device cannot do are disabled, with the reason beside them.
+function markUnavailable(){
+  if(!canMic){ ['tunerBtn'].forEach(id=>{ $(id).disabled=true; $(id).title=TR('tNoMic') });
+    const r=document.querySelector('#inSeg [data-in="real"]'); r.disabled=true; r.title=TR('tNoMic'); $('tStatus').textContent=TR('tNoMic') }
+  const hapOK={hole:canVib||isIOS,metro:canVib,wrong:canVib};
+  [['hapHole','hole'],['hapMetro','metro'],['hapWrong','wrong']].forEach(([id,k])=>{ const c=$(id); c.disabled=!hapOK[k]; c.closest('label').classList.toggle('na',!hapOK[k]); c.closest('label').title=hapOK[k]?'':TR('hapNA') });
+}
+
+drawRecorder(); applyLang(); markUnavailable();
 if(FIRST_LAUNCH){ showLangPick(true); $('langpick').focus() }
 })();
 </script>
