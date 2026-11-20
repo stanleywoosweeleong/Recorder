@@ -175,6 +175,13 @@ section{display:flex;flex-direction:column;gap:14px}
 .fp.tab{background:color-mix(in srgb,var(--wood-mid) 55%,transparent);border-style:dashed}
 .fp.tab span{color:var(--ink);font-size:13px}
 .fp.tab.covered span{color:var(--accent-ink)}
+/* note-start flash so repeated notes are visible */
+@keyframes flash{0%{filter:brightness(1.6)}100%{filter:none}}
+@keyframes winflash{0%{fill:var(--accent)}100%{fill:var(--hole)}}
+.flash{animation:flash .18s ease-out}
+#win.flash{animation:winflash .2s ease-out}
+.fm-note b.flash{animation:none;color:var(--accent)}
+#syncv{font-variant-numeric:tabular-nums;min-width:4.5em;display:inline-block}
 @media (max-width:640px){
   .stage{gap:12px}
   #rec{height:min(68vh,560px)}
@@ -226,6 +233,7 @@ section{display:flex;flex-direction:column;gap:14px}
         </label>
         <label class="ctl" for="vol">Volume <input id="vol" type="range" min="0" max="100" value="70"></label>
         <label class="ctl" for="vib"><input id="vib" type="checkbox" checked> Vibrato</label>
+        <label class="ctl" for="sync" title="If the fingers move before you hear the note, slide right. If they move after, slide left.">Finger sync <input id="sync" type="range" min="-300" max="600" step="10" value="0"> <span id="syncv">0 ms</span></label>
         <button class="ghost" id="openAll" type="button">Open all</button>
         <button class="ghost" id="closeAll" type="button">Cover all</button>
       </div>
@@ -275,6 +283,7 @@ section{display:flex;flex-direction:column;gap:14px}
     <button type="button" id="fmPractice">Practice</button>
     <span id="fmMic" hidden><span style="display:inline-flex;align-items:center;gap:6px">Breath <span class="meter" id="meter"><i></i></span></span>
       <label for="sens" style="display:inline-flex;align-items:center;gap:6px;margin-left:8px">Sensitivity <input id="sens" type="range" min="1" max="100" value="55" style="width:80px"></label></span>
+    <span style="display:inline-flex;align-items:center;gap:6px">Sync <input id="sync2" type="range" min="-300" max="600" step="10" value="0" style="width:80px" aria-label="Finger sync"></span>
     <span id="fmMsg">Touch the holes to play. Sound plays while any finger is down.</span>
   </div>
   <div class="fm-field" id="fmField">
@@ -386,7 +395,7 @@ function drawRecorder(){
   // head with beak
   P(`M${CX-20} 8 Q${CX} 0 ${CX+20} 8 L${CX+31} 60 L${CX+33} 200 L${CX-33} 200 L${CX-31} 60 Z`);
   // window / labium
-  const w=el('path',{d:`M${CX-11} 132 L${CX+11} 132 L${CX+11} 152 L${CX-11} 152 Z`}); w.style.fill='var(--hole)';
+  const w=el('path',{id:'win',d:`M${CX-11} 132 L${CX+11} 132 L${CX+11} 152 L${CX-11} 152 Z`}); w.style.fill='var(--hole)';
   const lab=el('path',{d:`M${CX-11} 152 L${CX+11} 152 L${CX} 168 Z`}); lab.style.fill='var(--wood-lo)';lab.style.opacity='.6';
   const wind=el('path',{d:`M${CX-9} 12 L${CX+9} 12`}); wind.style.stroke='var(--hole)';wind.style.strokeWidth='3';wind.style.strokeLinecap='round';
   // body
@@ -604,6 +613,14 @@ $('practice').addEventListener('click',()=>{
 // Listen: every note is scheduled on the audio clock up front, then the fingers follow
 // the audio clock minus the device's output delay, so what you see matches what you hear.
 let demoRaf=0;
+function pulse(){ ['blow','win','fmNote'].forEach(id=>{const e=document.getElementById(id); if(!e) return; e.classList.remove('flash'); void e.getBoundingClientRect(); e.classList.add('flash')}) }
+const syncEl=$('sync'), sync2=$('sync2');
+const showSync=()=>{ $('syncv').textContent=(syncEl.value>0?'+':'')+syncEl.value+' ms'; sync2.value=syncEl.value };
+try{ const v=localStorage.getItem('recorderSync'); if(v!=null) syncEl.value=v }catch(_){}
+const onSync=()=>{ showSync(); try{localStorage.setItem('recorderSync',syncEl.value)}catch(_){} };
+syncEl.addEventListener('input',onSync);
+sync2.addEventListener('input',()=>{ syncEl.value=sync2.value; onSync() });
+showSync();
 function scheduleSong(list,t0){
   const now=A.ctx.currentTime, beat=60/song.bpm, vib=$('vib').checked;
   [A.g.gain,A.ng.gain,A.lfoG.gain,A.osc.frequency,A.lp.frequency,A.bp.frequency].forEach(p=>hold(p,now));
@@ -629,14 +646,14 @@ $('listen').addEventListener('click',()=>{
   setMsg(`Listening to ${song.zh}…`);
   const {starts,end}=scheduleSong(list,A.ctx.currentTime+0.12);
   A.on=true; sources.add('demo'); let shown=-1;
-  const lag=()=>(A.ctx.outputLatency||0)+(A.ctx.baseLatency||0);
+  const lag=()=>(A.ctx.outputLatency||0)+(A.ctx.baseLatency||0)+(+syncEl.value)/1000;
   const frame=()=>{
     if(mode!=='demo') return;
     const heard=A.ctx.currentTime-lag();
     if(heard>=end){ sources.delete('demo'); A.on=false; lastMidi=null; mode=null; markChips(); render();
       setMsg('Your turn: press Practice.'); if(!fm.hidden) fmText('Your turn: press Practice.'); return }
     let k=shown; while(k+1<starts.length&&starts[k+1]<=heard) k++;
-    if(k!==shown&&k>=0){ shown=k; setFingering(list[k].m); lastMidi=list[k].m; markChips(k); render() }
+    if(k!==shown&&k>=0){ shown=k; setFingering(list[k].m); lastMidi=list[k].m; markChips(k); render(); pulse() }
     demoRaf=requestAnimationFrame(frame);
   };
   demoRaf=requestAnimationFrame(frame);
