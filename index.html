@@ -684,7 +684,7 @@ $('practice').addEventListener('click',()=>{
 });
 // Listen: every note is scheduled on the audio clock up front, then the fingers follow
 // the audio clock minus the device's output delay, so what you see matches what you hear.
-let demoRaf=0;
+let demoRaf=0, demoT0=null;
 function pulse(){ ['blow','win','fmNote'].forEach(id=>{const e=document.getElementById(id); if(!e) return; e.classList.remove('flash'); void e.getBoundingClientRect(); e.classList.add('flash')}) }
 const syncEl=$('sync'), sync2=$('sync2');
 const showSync=()=>{ const t=(syncEl.value>0?'+':'')+syncEl.value+' ms'; $('syncv').textContent=t; $('syncv2').textContent=t; sync2.value=syncEl.value };
@@ -742,7 +742,7 @@ $('listen').addEventListener('click',()=>{
   stopSong(); ensure(); if(!A.ctx) return;
   mode='demo'; const list=playable();
   setMsg(`Listening to ${song.zh}…`);
-  const t0=A.ctx.currentTime+0.12, {starts,end}=scheduleSong(list,t0);
+  const t0=A.ctx.currentTime+0.12, {starts,end}=scheduleSong(list,t0); demoT0=t0;
   if(M.on){ setBpm(song.bpm); setBeats(song.beats||4); mStart(t0) }
   A.on=true; sources.add('demo'); let shown=-1;
   const lag=audioLag;
@@ -950,9 +950,9 @@ function mDraw(){
   if(cur) lightDot(cur.b);
   M.raf=requestAnimationFrame(mDraw);
 }
-function mStart(at){
+function mStart(at,beat){
   ensure(); if(!A.ctx) return; mStop(true);
-  M.on=true; M.beat=0; M.next=at!=null?at:A.ctx.currentTime+0.08;
+  M.on=true; M.beat=beat||0; M.next=at!=null?at:A.ctx.currentTime+0.08;
   mSchedule(); M.timer=setInterval(mSchedule,25); M.raf=requestAnimationFrame(mDraw); mUI();
 }
 function mStop(quiet){
@@ -960,7 +960,16 @@ function mStop(quiet){
   if(A.ctx) M.queue.forEach(q=>{ if(q.t>A.ctx.currentTime) try{q.o.stop(0)}catch(_){} });
   M.queue=[]; M.on=false; lightDot(-1); if(!quiet) mUI();
 }
-function mToggle(){ M.on?mStop():mStart() }
+function mToggle(){
+  if(M.on) return mStop();
+  // Switched on while a song is playing: match its tempo and come in on its next beat.
+  if(mode==='demo'&&demoT0!=null&&A.ctx){
+    setBpm(song.bpm); setBeats(song.beats||4);
+    const beat=60/song.bpm, n=Math.ceil((A.ctx.currentTime+0.05-demoT0)/beat);
+    return mStart(demoT0+n*beat, n%M.beats);
+  }
+  mStart();
+}
 let taps=[];
 $('mToggle').addEventListener('click',mToggle);
 $('fmMetro').addEventListener('click',mToggle);
