@@ -4,6 +4,8 @@ A playable soprano recorder in one web page. Tap the holes to cover them, hold *
 
 **Play it:** https://stanleywoosweeleong.github.io/Recorder/
 
+It is an installable app (PWA) that works offline. Open the link once while online; after that it runs with no internet, even in airplane mode. The bottom of the page says "Saved on this device: works offline" when it is ready.
+
 ## On a phone
 1. Open the link above in Safari (iPhone) or Chrome (Android).
 2. Turn the ringer/silent switch off on iPhone, or web audio may be muted.
@@ -20,4 +22,7 @@ Phones and Bluetooth speakers play sound a little late, and iPhone Safari doesn'
 ## On a computer
 Keys A S D F G H J K L ; ' play the natural notes, W E T Y U O P the sharps, 1–7 play 简谱 notes (Shift for the upper octave), and Space blows the fingering shown.
 
-No build step: `index.html` is the whole app.
+## Updating the app
+No build step and no version number to bump. Edit and push; GitHub Pages publishes in a minute or two. Phones open the saved copy instantly, check for a new one in the background, and show "A new version is ready" with a Refresh button.
+
+Files: `index.html` (the whole app), `sw.js` (offline cache), `manifest.webmanifest` and `icons/` (install as an app), `fonts/` (local copies so text looks right offline).

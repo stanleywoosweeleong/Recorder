@@ -1,18 +1,24 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-Hans">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#1B7461">
+<meta name="description" content="A playable soprano recorder (竖笛) that works offline.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="竖笛">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Soprano Recorder 竖笛</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;700&display=swap">
 <style>
+@font-face{font-family:"Bricolage Grotesque";font-style:normal;font-weight:200 800;font-display:swap;src:url(fonts/bricolage-grotesque.woff2) format("woff2")}
+@font-face{font-family:"IBM Plex Sans";font-style:normal;font-weight:100 700;font-display:swap;src:url(fonts/ibm-plex-sans.woff2) format("woff2")}
+@font-face{font-family:"IBM Plex Mono";font-style:normal;font-weight:500;font-display:swap;src:url(fonts/ibm-plex-mono-500.woff2) format("woff2")}
 /* Layout: the instrument stands upright on the left like a real 竖笛; the player's console sits beside it; fingering chart and songbook run below. */
 :root{
   --bg:#E7ECE6; --surface:#F6F9F4; --line:#C9D3CA; --ink:#17201B; --muted:#56645B;
@@ -192,6 +198,14 @@ section{display:flex;flex-direction:column;gap:14px}
   .fm-bar{padding-block:4px 2px}.fm-note b{font-size:28px}.fm-note .fjp{font-size:18px}
   .seg button,.fm-x{padding:5px 9px}.fm-row{padding-bottom:2px}.fm-row #fmMsg{flex-basis:100%}
 }
+.toast{position:fixed;left:0;right:0;bottom:0;z-index:60;display:flex;align-items:center;gap:10px;
+  padding:12px max(16px,env(safe-area-inset-right,0px)) calc(12px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));
+  background:var(--ink);color:var(--bg);font-size:14px}
+.toast span{flex:1}
+.toast button{border:0;border-radius:8px;padding:8px 14px;cursor:pointer;font-weight:600;background:var(--accent);color:var(--accent-ink)}
+.toast #toastx{background:transparent;color:var(--bg);padding:8px}
+.toast[hidden]{display:none}
+.offline{font-size:12px;color:var(--muted);margin:0}
 @media (max-width:640px){
   .stage{gap:12px}
   #rec{height:min(68vh,560px)}
@@ -277,6 +291,7 @@ section{display:flex;flex-direction:column;gap:14px}
       <div class="msg" id="msg">Pick a song, then press Listen or Practice.</div>
     </div>
   </section>
+  <p class="offline" id="offline">Open once online to save the app for offline use.</p>
 </div>
 
 <div class="fm" id="fm" hidden role="dialog" aria-label="Finger mode"><div class="fm-in">
@@ -521,7 +536,7 @@ function buildChart(){
     const b=document.createElement('button'); b.type='button'; b.className='cn'; b.dataset.m=m;
     b.setAttribute('aria-label',`${sci(m)}, hold to play`);
     b.innerHTML=`${mini(table()[m])}<span class="nm">${label(m)}</span><span class="jp">${jianpu(m)}</span>`;
-    b.addEventListener('pointerdown',e=>{e.preventDefault();b.setPointerCapture?.(e.pointerId);playMidi(m,'chart')});
+    b.addEventListener('pointerdown',e=>{e.preventDefault();try{b.setPointerCapture(e.pointerId)}catch(_){}playMidi(m,'chart')});
     ['pointerup','pointercancel','lostpointercapture'].forEach(ev=>b.addEventListener(ev,()=>release('chart')));
     b.addEventListener('contextmenu',e=>e.preventDefault());
     b.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.repeat){e.preventDefault();playMidi(m,'chart-key')}});
@@ -532,7 +547,7 @@ function buildChart(){
 
 /* ---------- blow button & keyboard ---------- */
 const blowBtn=$('blow');
-blowBtn.addEventListener('pointerdown',e=>{e.preventDefault();blowBtn.setPointerCapture?.(e.pointerId);startBlow('pointer')});
+blowBtn.addEventListener('pointerdown',e=>{e.preventDefault();try{blowBtn.setPointerCapture(e.pointerId)}catch(_){}startBlow('pointer')});
 ['pointerup','pointercancel','lostpointercapture'].forEach(ev=>blowBtn.addEventListener(ev,()=>release('pointer')));
 blowBtn.addEventListener('contextmenu',e=>e.preventDefault());
 
@@ -853,6 +868,34 @@ $('fmListen').addEventListener('click',()=>{ touches.clear(); breath(false); $('
 $('fmPractice').addEventListener('click',()=>{ $('practice').click(); fmText('Cover the holes with orange rings, then play.') });
 
 drawRecorder(); buildChart(); buildTabs(); buildSong(); render();
+})();
+</script>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden>
+  <span>A new version is ready. 有新版本</span>
+  <button type="button" id="toastgo">Refresh</button>
+  <button type="button" id="toastx" aria-label="Dismiss">✕</button>
+</div>
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  $("toastgo").onclick = function(){ location.reload(); };
+  $("toastx").onclick = function(){ $("toast").hidden = true; };
+  var d = new Date(document.lastModified), p = function(n){ return (n < 10 ? "0" : "") + n; };
+  var stamp = isNaN(d) ? "" : " Version " + d.getFullYear() + "-" + p(d.getMonth()+1) + "-" + p(d.getDate()) + ".";
+  if (!("serviceWorker" in navigator) || location.protocol === "file:") return;
+  var askForUpdate = function(){
+    if (navigator.onLine === false) return;
+    navigator.serviceWorker.ready.then(function(reg){ if (reg.active) reg.active.postMessage("check"); }).catch(function(){});
+  };
+  navigator.serviceWorker.addEventListener("message", function(e){ if (e.data === "updated") $("toast").hidden = false; });
+  window.addEventListener("load", function(){
+    navigator.serviceWorker.register("./sw.js").then(askForUpdate).catch(function(){});
+  });
+  navigator.serviceWorker.ready.then(function(){
+    $("offline").textContent = "Saved on this device: works offline, even in airplane mode. 已可离线使用。" + stamp;
+  }).catch(function(){});
+  document.addEventListener("visibilitychange", function(){ if (document.visibilityState === "visible") askForUpdate(); });
 })();
 </script>
 </body>
