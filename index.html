@@ -708,6 +708,7 @@ const STR={
  inReal:['Play your own recorder near the phone. Practice and Play along will listen to it.','在手机旁吹你自己的竖笛。“练习”和“跟拍演奏”会听它。','Mainkan rekorder anda berhampiran telefon. Latihan dan Main bersama akan mendengarnya.'],
  inScreen:['Play the on-screen recorder.','演奏屏幕上的竖笛。','Mainkan rekorder pada skrin.'],
  rest:['rest','休止','rehat'], notesN:['{n} notes','{n} 个音','{n} not'], best:['Best ★{n}%','最佳 ★{n}%','Terbaik ★{n}%'],
+ cantPlay:["This song has {n} note(s) the {r} recorder can't play: {x}. Switch recorder, or change the song's key.",'这首歌有 {n} 个音是{r}竖笛吹不出的：{x}。请换一支竖笛，或改变歌曲的调。','Lagu ini ada {n} not yang tidak boleh dimainkan oleh rekorder {r}: {x}. Tukar rekorder, atau ubah kunci lagu.'],
  outRange:["Some notes are outside this recorder's range",'部分音超出这支竖笛的音域','Sebahagian not di luar julat rekorder ini'],
  delSong:['Delete song','删除歌曲','Padam lagu'], delSure:['Tap again to delete','再点一次删除','Ketik lagi untuk padam'], deleted:['Song deleted.','歌曲已删除。','Lagu dipadam.'],
  scoreW:['score','得分','markah'], notesOf:['{a}/{b} notes','{a}/{b} 个音','{a}/{b} not'], timing:['±{ms} ms timing','节奏误差 ±{ms} 毫秒','masa ±{ms} ms'],
@@ -920,13 +921,14 @@ function changed(){
   if(blowing() && n.midi!==lastMidi){ soundGlide(n.midi); lastMidi=n.midi; onset(n.midi,'glide') }
   render();
 }
-function setFingering(m){ holes=[...table()[m]].map(dec) }
+function setFingering(m){ const f=table()[m]; if(!f) return false; holes=[...f].map(dec); return true }
 function startBlow(src){
   ensure(); const was=blowing(); sources.add(src);
   if(!was){ const n=cur(); soundOn(n.midi); lastMidi=n.midi; onset(n.midi,'start') }
   render();
 }
 function playMidi(m,src){
+  if(!table()[m]) return;                 // this recorder has no fingering for that note (e.g. alto above G6)
   ensure(); setFingering(m); const was=blowing(); sources.add(src);
   if(was) soundTongue(m); else soundOn(m);
   lastMidi=m; onset(m,'start'); render();
@@ -979,8 +981,8 @@ function render(){
     g.classList.remove('want','ok','lift');
   });
   const tgt=target();
-  if(tgt!=null){
-    const f=[...table()[tgt]].map(dec);
+  if(tgt!=null&&table()[tgt]){
+    const f=table()[tgt]?[...table()[tgt]].map(dec):null;
     document.querySelectorAll('.hole').forEach(g=>{const i=+g.dataset.i;
       if(f[i]) {g.classList.add('want'); if(f[i]===holes[i]) g.classList.add('ok')}
       else if(holes[i]) g.classList.add('lift');
@@ -1122,7 +1124,13 @@ let song=SONGS[0], mode=null, idx=0, timer=null;
 let P={list:[],i:0}, TL=null, J=null, loopSel=null, loopPick=null, view='jp', inputSrc='screen';
 try{ const v=JSON.parse(localStorage.getItem('recorderView')||'{}'); if(v.view) view=v.view; if(v.input) inputSrc=v.input }catch(_){}
 const saveView=()=>{ try{localStorage.setItem('recorderView',JSON.stringify({view,input:inputSrc}))}catch(_){} };
-const evAll=()=>song.notes.filter(n=>!n.bar);                 // notes and rests, in chip order
+const evAll=()=>song.notes.filter(n=>!n.bar);
+const unplayable=()=>evAll().filter(n=>!n.rest&&!table()[n.m]);   // notes this recorder has no fingering for
+function blockedByRange(){
+  const bad=unplayable(); if(!bad.length) return false;
+  const names=[...new Set(bad.map(n=>label(n.m)))].slice(0,6).join(' ');
+  setMsg(TR('cantPlay',{n:bad.length,r:TR(inst==='alto'?'alto':'soprano'),x:names})); return true;
+}                 // notes and rests, in chip order
 const segRange=()=>loopSel||[0,evAll().length-1];
 const playable=()=>{ const [a,b]=segRange(); return evAll().map((n,k)=>({...n,k})).filter(n=>!n.rest&&n.k>=a&&n.k<=b) };
 const beatAt=k=>{ let x=0; const e=evAll(); for(let i=0;i<k;i++) x+=e[i].b; return x };
@@ -1139,17 +1147,20 @@ function buildTabs(){
   const t=$('tabs'); t.innerHTML='';
   SONGS.forEach(s=>{const b=document.createElement('button');b.type='button';b.className='tab';b.setAttribute('role','tab');
     b.setAttribute('aria-selected',s===song);
-    b.innerHTML=songTitle(s)+(BEST[s.id]!=null?` <span class="star">★${BEST[s.id]}%</span>`:'');
+    b.textContent=songTitle(s);
+    if(BEST[s.id]!=null){ const st=document.createElement('span'); st.className='star'; st.textContent=` ★${BEST[s.id]}%`; b.appendChild(st) }
     b.addEventListener('click',()=>{stopSong();song=s;loopSel=null;buildTabs();buildSong();setMsg(TR('msgPress'))});t.appendChild(b)});
   if(!fm.hidden) fillFmSongs();
 }
 function buildSong(){
-  const n=evAll().filter(x=>!x.rest).length, outOfRange=evAll().some(x=>!x.rest&&(x.m<LO||x.m>HI));
-  const meta=$('songmeta'); meta.innerHTML=`<b></b>${songAlt(song)?'<span class="alt"></span>':''}<span>${song.key}</span><span>${song.beats}/4</span><span>♩ = ${song.bpm}</span><span>${TR('notesN',{n})}</span>`+
-    (BEST[song.id]!=null?`<span>${TR('best',{n:BEST[song.id]})}</span>`:'')+
-    (outOfRange?`<span class="warnc">${TR('outRange')}</span>`:'')+
-    (song.custom?`<button type="button" class="ghost" id="delSong">${TR('delSong')}</button>`:'');
-  meta.querySelector('b').textContent=songTitle(song); if(meta.querySelector('.alt')) meta.querySelector('.alt').textContent=songAlt(song);
+  const n=evAll().filter(x=>!x.rest).length, outOfRange=unplayable().length>0;
+  const meta=$('songmeta'); meta.textContent='';
+  const add=(tag,txt,cls)=>{ const e=document.createElement(tag); e.textContent=txt; if(cls) e.className=cls; meta.appendChild(e); return e };
+  add('b',songTitle(song)); if(songAlt(song)) add('span',songAlt(song),'alt');
+  add('span',String(song.key)); add('span',`${song.beats}/4`); add('span',`♩ = ${song.bpm}`); add('span',TR('notesN',{n}));
+  if(BEST[song.id]!=null) add('span',TR('best',{n:BEST[song.id]}));
+  if(outOfRange) add('span',TR('outRange'),'warnc');
+  if(song.custom){ const d=add('button',TR('delSong'),'ghost'); d.type='button'; d.id='delSong' }
   if(song.custom) $('delSong').onclick=()=>{ if($('delSong').dataset.sure){ CUSTOM=CUSTOM.filter(s=>s!==song); saveCustom(); SONGS=BUILTIN.concat(CUSTOM); song=SONGS[0]; buildTabs(); buildSong(); setMsg(TR('deleted')) } else { $('delSong').dataset.sure='1'; $('delSong').textContent=TR('delSure') } };
   const box=$('notes'); box.innerHTML=''; let k=0;
   song.notes.forEach(x=>{
@@ -1269,6 +1280,7 @@ let forcedMetro=false;
 function stopForcedMetro(){ if(forcedMetro){ forcedMetro=false; mStop() } }
 function stopSong(){
   clearTimeout(timer); timer=null; cancelAnimationFrame(demoRaf);
+  tunerPause(false);                         // Listen pauses the mic listener; any stop or mode change resumes it
   if(mode==='demo') release('demo');
   if(mode==='along'||mode==='practice') stopForcedMetro();
   mode=null; TL=null; markChips(); render();
@@ -1277,6 +1289,7 @@ $('stop').addEventListener('click',()=>{ stopSong(); J=null; $('result').hidden=
 async function useRealInput(){ if(inputSrc==='real'&&typeof tunerStart==='function') await tunerStart(true) }
 $('practice').addEventListener('click',async()=>{
   stopSong(); ensure(); J=null; $('result').hidden=true;
+  if(blockedByRange()) return;
   P={list:playable(),i:0}; if(!P.list.length) return;
   mode='practice'; await useRealInput();
   setMsg(TR(inputSrc==='real'?'prReal':'prScreen',{n:label(P.list[0].m)}));
@@ -1350,7 +1363,7 @@ function scheduleSong(evs,t0,spb){
   return {starts,end:t};
 }
 $('listen').addEventListener('click',()=>{
-  stopSong(); ensure(); if(!A.ctx) return; if(typeof tunerPause==='function') tunerPause(true);
+  stopSong(); ensure(); if(!A.ctx||blockedByRange()) return; tunerPause(true);
   mode='demo'; J=null; $('result').hidden=true;
   const [a,b]=segRange(), evs=evAll().slice(a,b+1), spb=60/(song.bpm*speed());
   setMsg(TR('listening',{s:songTitle(song)+(loopSel?TR('loopTag'):'')}));
@@ -1364,7 +1377,7 @@ $('listen').addEventListener('click',()=>{
     if(heard>=end){
       sources.delete('demo'); A.on=false; lastMidi=null;
       if(loopSel){ $('listen').click(); return }
-      mode=null; TL=null; markChips(); render(); if(typeof tunerPause==='function') tunerPause(false);
+      mode=null; TL=null; markChips(); render(); tunerPause(false);
       setMsg(TR('yourTurn')); return }
     let k=shown; while(k+1<starts.length&&starts[k+1]<=heard) k++;
     if(k!==shown&&k>=0){ shown=k; const n=evs[k];
@@ -1377,6 +1390,7 @@ $('listen').addEventListener('click',()=>{
 /* Play along: a bar of count-in clicks, then you play in time. Each note is scored on pitch and timing. */
 $('along').addEventListener('click',async()=>{
   stopSong(); ensure(); if(!A.ctx) return;
+  if(blockedByRange()) return;
   const [a,b]=segRange(), evs=evAll().slice(a,b+1), spb=60/(song.bpm*speed()), beats=song.beats||4;
   if(!evs.some(n=>!n.rest)) return;
   await useRealInput();
@@ -1432,7 +1446,7 @@ $('songForm').addEventListener('submit',e=>{
   const err=$('sfErr');
   if(errs.length){ err.textContent=TR('sfBad',{x:errs.slice(0,5).join('  ')}); return }
   if(!notes.some(n=>!n.bar&&!n.rest)){ err.textContent=TR('sfEmpty'); return }
-  const out=notes.filter(n=>!n.bar&&!n.rest&&(n.m<LO||n.m>HI));
+  const out=notes.filter(n=>!n.bar&&!n.rest&&!table()[n.m]);
   const s={id:'c'+Date.now(),name:$('sfName').value.trim()||TR('mySong'),zh:'',key:$('sfKey').selectedOptions[0].textContent.split(' ')[0],tonic,
     bpm:Math.max(40,Math.min(208,+$('sfBpm').value||96)),beats:+$('sfBeats').value,pickup:Math.max(0,+$('sfPick').value||0),src:$('sfNotes').value.trim()};
   s.notes=notes; s.custom=true; CUSTOM.push(s); saveCustom(); SONGS=BUILTIN.concat(CUSTOM);
@@ -1550,7 +1564,7 @@ function renderFM(n,tgt){
   $('fmNote').textContent=idle?'–':(n.approx?'≈':'')+label(n.midi);
   $('fmJp').innerHTML=idle?'':jianpu(n.midi);
   $('fmTgt').textContent=tgt!=null?TR('next',{n:label(tgt)}):'';
-  const f=tgt!=null?[...table()[tgt]].map(dec):null;
+  const f=tgt!=null&&table()[tgt]?[...table()[tgt]].map(dec):null;
   fmPads.forEach(d=>{const i=+d.dataset.i, v=+d.dataset.v, tab=d.classList.contains('tab');
     d.classList.toggle('covered', tab?holes[i]===2:holes[i]===1);
     d.classList.toggle('halfc', !tab&&holes[i]===2);
