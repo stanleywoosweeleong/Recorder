@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#1B7461">
+<meta name="theme-color" content="#E7ECE6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F1412" media="(prefers-color-scheme: dark)">
 <meta name="description" content="A playable soprano recorder (竖笛) that works offline.">
 <script>/* apply a saved light/dark choice before the first paint; the theme code near the end of the page takes over from here */
 try{var t=localStorage.getItem('recorderTheme');if(t==='light'||t==='dark'){document.documentElement.dataset.theme=t;document.documentElement.dataset.themeSet='1'}}catch(e){}</script>
@@ -2035,7 +2036,9 @@ $('tunerBtn').addEventListener('click',()=>{ if(tuner&&tuner.paused){ stopSong()
 /* ---------- light / dark: the CSS follows the device unless <html data-theme> says otherwise. The choice stays
    'auto' until the sun / moon button is tapped, which flips to the other theme and keeps it.
    A page that hosts the app may set data-theme itself, so 'auto' leaves that in place. ---------- */
+const THEME_BAR={light:'#E7ECE6',dark:'#0F1412'};
 const themeRoot=document.documentElement;
+const themeMetas=[...document.querySelectorAll('meta[name="theme-color"]')].map(m=>[m,m.content]);
 const themeHost=themeRoot.dataset.themeSet?null:(themeRoot.dataset.theme||null);
 const themeDevice=matchMedia('(prefers-color-scheme: dark)');
 let THEME='auto';
@@ -2043,6 +2046,7 @@ try{ const v=localStorage.getItem('recorderTheme'); if(v==='light'||v==='dark') 
 const themeNow=()=>THEME!=='auto'?THEME:themeHost||(themeDevice.matches?'dark':'light');   // what is on screen
 function applyTheme(){
   if(THEME!=='auto') themeRoot.dataset.theme=THEME; else if(themeHost) themeRoot.dataset.theme=themeHost; else delete themeRoot.dataset.theme;
+  for(const [m,was] of themeMetas) m.content=THEME==='auto'?(themeHost?THEME_BAR[themeHost]||was:was):THEME_BAR[THEME];   // browser toolbar / status bar colour
   const b=$('themeBtn'), to=themeNow()==='dark'?'light':'dark', label=TR(to==='dark'?'toDark':'toLight');   // the button shows where a tap goes
   b.setAttribute('aria-label',label); b.title=label;
   b.querySelectorAll('[data-to]').forEach(i=>{ i.toggleAttribute('hidden',i.dataset.to!==to) });
